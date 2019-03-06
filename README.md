@@ -1,2 +1,2 @@
 # Rift
-An ETL framework in Scala for Data Engineers
+An ETL framework in Scala for Data engineers
