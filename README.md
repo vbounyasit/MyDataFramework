@@ -1,4 +1,4 @@
-# Rift ETL
+# Rift Framework
 _An ETL Framework in Scala for Data engineers._
 
 ## Overview
@@ -7,14 +7,16 @@ with the purpose of allowing Data engineers to write efficient,
 clean and bug-free data processing projects with [Apache Spark](https://spark.apache.org/).
 
 The main objective of this Framework is to make the engineer mainly focus on writing the 
-**Transformation** logic of large scale ETL projects, rather than writing the entire application over and over, 
+**Transformation** logic of large scale ETL projects, rather than writing the entire application layout over and over, 
 by providing only the necessary information for input data sources extraction and output data persistence. 
 
 ## Context & Requirements
+_Under Construction._
 
-## Getting Started
-
-## Documentation
+## Getting Started & Documentation
+The Rift Framework maintains reference documentation 
+Github [wiki pages](https://github.com/vbounyasit/Rift-ETL/wiki), and will have a 
+better support later on as the website construction progresses.
 
 ## Libraries used
 - [Apache Spark](https://spark.apache.org/)
@@ -24,4 +26,4 @@ by providing only the necessary information for input data sources extraction an
 - [Slf4j](https://www.slf4j.org/)
 
 ## License
-The Rift ETL Framework is released under version 2.0 of the [Apache License](http://www.apache.org/licenses/LICENSE-2.0).
+The Rift Framework is released under version 2.0 of the [Apache License](http://www.apache.org/licenses/LICENSE-2.0).
