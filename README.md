@@ -1,5 +1,5 @@
 # Rift Framework
-_An ETL Framework in Scala for Data engineers._
+_An ETL Framework based on [Apache Spark](https://spark.apache.org/) for Data engineers._
 
 ## Overview
 This is a project I have been working on for a few months, 
