@@ -1,0 +1,9 @@
+# Created by .ignore support plugin (hsz.mobi)
+.idea/
+target
+*.iml
+spark_ui_events
+derby.log
+metastore_db/
+
+spark-warehouse/
