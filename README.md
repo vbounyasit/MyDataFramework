@@ -84,9 +84,6 @@ putting it on Maven central repository, and creating some sample projects based 
 - [Scopt](https://github.com/scopt/scopt)
 - [Slf4j](https://www.slf4j.org/)
 
-## License
-The Rift Framework is released under version 2.0 of the [Apache License](http://www.apache.org/licenses/LICENSE-2.0).
-
 ## About me
 I am a data engineer who have been working with [Apache Spark](https://spark.apache.org/) for almost two years and have found a particular interest for this field. 
 I am passionate about tackling innovative and complex challenges.
@@ -98,3 +95,6 @@ almost or exactly the same from one project to another (such as data extraction,
 I felt that something could be done about this, and that the data engineer community could have a use for a project like that. Moreover,
 in order to deepen my understanding of Spark and the Scala language, what better way to practice than by writing a 
 project from scratch?
+
+## License
+The Rift Framework is released under version 2.0 of the [Apache License](http://www.apache.org/licenses/LICENSE-2.0).
