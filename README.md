@@ -1,5 +1,5 @@
-# Rift
-_An ETL Framework based on [Apache Spark](https://spark.apache.org/) for Data engineers._
+# Rift Framework
+_An ETL Framework in Scala based on [Apache Spark](https://spark.apache.org/) for Data engineers._
 
 ## Overview
 This is a project I have been working on for a few months, 
@@ -8,7 +8,8 @@ clean and bug-free data processing projects with [Apache Spark](https://spark.ap
 
 The main objective of this Framework is to make the engineer mainly focus on writing the 
 **Transformation** logic of large scale ETL projects, rather than writing the entire application layout over and over, 
-by providing only the necessary information for input data sources extraction and output data persistence. 
+by providing only the necessary information for input data sources extraction, output data persistence, and writing 
+the data transformation logic.
 
 ## Context & Requirements
 _This section will cover the requirements as well as the main use case for this project to help you determine
@@ -22,7 +23,7 @@ You must have realized that no matter how many ETL projects you create, the vast
 a certain common structure that you have to rewrite every time. The only thing that really needs your full attention
 is the transformation logic. Indeed, when you have figured out where you get your data from, and what to do with
 the result of your pipelines, the logic does not change much from one project to another. The only 
-thing that needs all your attention is the actual data pipeline logic. You want to write the most optimized and efficient
+thing that needs all your attention is the actual data pipeline. You want to write the most optimized and efficient
 transformation logic for your data.
 
 I have written this Framework for that very purpose. Apart from some configuration files creation and some parsing logic
@@ -30,13 +31,12 @@ I have written this Framework for that very purpose. Apart from some configurati
 transformation pipelines, and configure your Unit/Integration tests. Those alone should allow you to have 
 a perfectly working and boilerplate-free project with good test coverage.
 
-However, from my experience as a data engineer, I have made some assumptions that will be the requirements
-needed to use this Framework : 
+However, from my experience as a data engineer, I have defined some requirements for the use of this Framework : 
 
 - The project is in Scala. Therefore, you will need some proficiency with this language.
 - You need to have a functional Spark cluster with a cluster management, as any project based on this will be spark-submitted to 
 that cluster.
-- All your input data sources for your Spark jobs will have to be queryable from [Spark Hive](https://spark.apache.org/docs/latest/sql-data-sources-hive-tables.html)(sources are queried with `spark.read.table(s"$database.$table")`)
+- All your input data sources for your Spark jobs will have to be queryable from [Spark Hive](https://spark.apache.org/docs/latest/sql-data-sources-hive-tables.html) (sources are queried with `spark.read.table(s"$database.$table")`)
 - You will have to implement your own logic for handling the output result from your Spark jobs.
 
 The two first requirements are quite obvious. However, the two last ones are not. 
@@ -73,8 +73,8 @@ the [wiki](https://github.com/vbounyasit/Rift-ETL/wiki) and start making your ow
 
 &nbsp;
 
-_**Note**: So far, I have only released the source code for this project on Github. It is yet not usable as is, but I am planning on
-putting it on Maven central, and creating some sample projects based on it, supported by a strong documentation through the 
+_**Note**: So far, I have only released the source code for this project on Github. It is yet not usable as is, not it is correctly documented. But I am planning on
+putting it on Maven central repository, and creating some sample projects based on it, supported by a strong documentation through the 
 [wiki](https://github.com/vbounyasit/Rift-ETL/wiki)_
 
 ## Libraries used
