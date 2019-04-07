@@ -22,9 +22,8 @@ or other working teams such as the data scientists.
 You must have realized that no matter how many ETL projects you create, the vast majority of them follow 
 a certain common structure that you have to rewrite every time. The only thing that really needs your full attention
 is the transformation logic. Indeed, when you have figured out where you get your data from, and what to do with
-the result of your pipelines, the logic does not change much from one project to another. The only 
-thing that needs all your attention is the actual data pipeline. You want to write the most optimized and efficient
-transformation logic for your data.
+the result of your pipelines, the logic does not change much from one project to another.
+What's important here is the actual data pipeline. You want to write the most optimized and efficient logic.
 
 I have written this Framework for that very purpose. Apart from some configuration files creation and some parsing logic
 (such as command line argument parsing, etc...), you will only have to focus on setting up your
@@ -73,7 +72,7 @@ the [wiki](https://github.com/vbounyasit/Rift-ETL/wiki) and start making your ow
 
 &nbsp;
 
-_**Note**: So far, I have only released the source code for this project on Github. It is yet not usable as is, not it is correctly documented. But I am planning on
+_**Note**: So far, I have only released the source code for this project on Github. It is yet not usable as is, nor it is correctly documented. But I am planning on
 putting it on Maven central repository, and creating some sample projects based on it, supported by a strong documentation through the 
 [wiki](https://github.com/vbounyasit/Rift-ETL/wiki)_
 

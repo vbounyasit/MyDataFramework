@@ -7,6 +7,31 @@
     <groupId>com.vbounyasit.bigdata</groupId>
     <artifactId>rift-etl</artifactId>
     <version>1.0</version>
+    <packaging>jar</packaging>
+
+    <name>Rift</name>
+    <description>A Scala ETL Framework based on Apache Spark for Data engineers.</description>
+    <url>https://github.com/vbounyasit/Rift-ETL</url>
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>Vibert Bounyasit</name>
+            <email>vibert.bounyasit@gmail.com</email>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:git://github.com/vbounyasit/Rift-ETL.git</connection>
+        <developerConnection>scm:git:ssh://github.com/vbounyasit/Rift-ETL.git</developerConnection>
+        <url>http://github.com/vbounyasit/Rift-ETL/tree/master</url>
+    </scm>
 
     <properties>
         <scala.version>2.11</scala.version>
