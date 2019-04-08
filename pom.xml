@@ -4,7 +4,7 @@
 
     <groupId>io.github.vbounyasit</groupId>
     <artifactId>rift-etl</artifactId>
-    <version>1.6-SNAPSHOT</version>
+    <version>1.6</version>
     <packaging>jar</packaging>
 
     <name>Rift</name>
@@ -29,7 +29,7 @@
         <connection>scm:git:git://github.com/vbounyasit/Rift-ETL.git</connection>
         <developerConnection>scm:git:ssh://github.com/vbounyasit/Rift-ETL.git</developerConnection>
         <url>http://github.com/vbounyasit/Rift-ETL/tree/master</url>
-      <tag>rift-etl-1.5</tag>
+      <tag>rift-etl-1.6</tag>
   </scm>
 
     <properties>
