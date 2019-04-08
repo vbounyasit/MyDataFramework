@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>io.github.vbounyasit</groupId>
     <artifactId>rift-etl</artifactId>
-    <version>1.5-SNAPSHOT</version>
+    <version>1.5</version>
     <packaging>jar</packaging>
 
     <name>Rift</name>
@@ -31,7 +29,8 @@
         <connection>scm:git:git://github.com/vbounyasit/Rift-ETL.git</connection>
         <developerConnection>scm:git:ssh://github.com/vbounyasit/Rift-ETL.git</developerConnection>
         <url>http://github.com/vbounyasit/Rift-ETL/tree/master</url>
-    </scm>
+      <tag>rift-etl-1.5</tag>
+  </scm>
 
     <properties>
         <scala.version>2.11</scala.version>
