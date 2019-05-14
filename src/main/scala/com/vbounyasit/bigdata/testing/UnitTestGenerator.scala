@@ -70,6 +70,7 @@ trait UnitTestGenerator extends TestComponents {
             unitTest.transformer.pipeline
           ).transform
 
+          logger.info("Computing and comparing DataFrames...")
           /**
             * Then
             */
@@ -87,6 +88,7 @@ trait UnitTestGenerator extends TestComponents {
             fail("Expected dataFrame was not equal to Obtained dataFrame")
           } else {
             logger.info("Unit test has passed.")
+            succeed
           }
         }
       })

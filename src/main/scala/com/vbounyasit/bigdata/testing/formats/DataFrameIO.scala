@@ -66,7 +66,8 @@ object DataFrameIO {
       val fileName = s"$database.$table.$fileExtension"
 
       val filePath = s"$folderPath/$fileName"
-      val filePresent = new File(folderPath).listFiles().map(_.getName).contains(fileName)
+      val files = Option(new File(folderPath).listFiles())
+      val filePresent = files.nonEmpty && files.get.map(_.getName).contains(fileName)
 
       if (filePresent) {
         val readDataFrame: DataFrame = convertFileToDataFrame(filePath)

@@ -204,7 +204,10 @@ trait JobsTestGenerator extends TestComponents {
                   )
                 }
                 fail("Resulting DataFrame was not equal to Expected DataFrame.")
-              } else logger.info("Spark Integration test passed.")
+              } else {
+                logger.info("Spark Integration test passed.")
+                succeed
+              }
             case Left(_) =>
               val columnsToSelect: Seq[String] = {
                 if (jobOutputId.nonEmpty)
