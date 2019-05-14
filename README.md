@@ -1,6 +1,8 @@
 # Rift Framework
 _A Scala ETL Framework based on [Apache Spark](https://spark.apache.org/) for Data engineers._
 
+The project has been released on Maven central ! See [Wiki pages](https://github.com/vbounyasit/Rift-ETL/wiki) to start right away.
+
 ## Overview
 This is a project I have been working on for a few months, 
 with the purpose of allowing Data engineers to write efficient, 
@@ -63,7 +65,7 @@ and send them to the business in csv files for their own use.
 _Note : The requirements above might change, depending on people feedback and suggestions_
 
 ## Getting Started & Documentation
-The Rift Framework maintains reference documentation 
+The Rift Framework maintains reference documentation on
 Github [wiki pages](https://github.com/vbounyasit/Rift-ETL/wiki), and will have a 
 better support later on as the website construction progresses.
 
@@ -71,10 +73,6 @@ If you think this Framework is the solution you have been looking for, you can h
 the [wiki](https://github.com/vbounyasit/Rift-ETL/wiki) and start making your own ETL project based on Rift !
 
 &nbsp;
-
-_**Note**: So far, I have only released the source code for this project on Github. It is yet not usable as is, nor it is correctly documented. But I am planning on
-putting it on Maven central repository, and creating some sample projects based on it, supported by a strong documentation through the 
-[wiki](https://github.com/vbounyasit/Rift-ETL/wiki)_
 
 ## Libraries used
 - [Apache Spark](https://spark.apache.org/)
