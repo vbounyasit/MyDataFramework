@@ -25,20 +25,20 @@ You must have realized that no matter how many ETL projects you create, the vast
 a certain common structure that you have to rewrite every time. The only thing that really needs your full attention
 is the transformation logic. Indeed, when you have figured out where you get your data from, and what to do with
 the result of your pipelines, the logic does not change much from one project to another.
-What's important here is the actual data pipeline. You want to write the most optimized and efficient logic.
+What's important here is **the actual data pipeline**. You want to write the most optimized and efficient logic.
 
-I have written this Framework for that very purpose. Apart from some configuration files creation and some parsing logic
-(such as command line argument parsing, etc...), you will only have to focus on setting up your
+I have written this Framework **for that very purpose**. Aside from some configuration files creation, you will only have to focus on setting up your
 transformation pipelines, and configure your Unit/Integration tests. Those alone should allow you to have 
 a perfectly working and boilerplate-free project with good test coverage.
 
-However, from my experience as a data engineer, I have defined some requirements for the use of this Framework : 
+These are the requirements for this Framework : 
 
 - The project is in Scala. Therefore, you will need some proficiency with this language.
-- You need to have a functional Spark cluster with a cluster management, as any project based on this will be spark-submitted to 
-that cluster.
-- All your input data sources for your Spark jobs will have to be queryable from [Spark Hive](https://spark.apache.org/docs/latest/sql-data-sources-hive-tables.html) (sources are queried with `spark.read.table(s"$database.$table")`)
-- You will have to implement your own logic for handling the output result from your Spark jobs.
+- You need to have a functional Spark cluster with a cluster management system, as any project based on this will be packaged 
+and **submitted as a Spark application** (with the spark-submit command).
+- All of the input data for your Spark jobs will have to be queryable from [Spark Hive](https://spark.apache.org/docs/latest/sql-data-sources-hive-tables.html) (sources are queried with `spark.read.table(s"$database.$table")`)
+- You will have to implement your own logic for handling the output result from your Spark jobs 
+(after running the Spark job, you will obtain a resulting processed Dataframe for your own use).
 
 The two first requirements are quite obvious. However, the two last ones are not. 
 
@@ -56,13 +56,14 @@ Since the method to persist the resulting data from Spark jobs differs greatly f
 I decided to leave that part for the engineers. 
 Especially when the way to deliver the resulting data is most likely to be determined by whoever needs them.
 
-For information, at previous company, we used to store them on HDFS 
+For information, at my previous company, we used to store them on HDFS 
 as parquet files, queryable through [Spark Hive](https://spark.apache.org/docs/latest/sql-data-sources-hive-tables.html),
 and send them to the business in csv files for their own use.
 
-&nbsp;
 
 _Note : The requirements above might change, depending on people feedback and suggestions_
+
+&nbsp;
 
 ## Getting Started & Documentation
 The Rift Framework maintains reference documentation on
@@ -71,8 +72,6 @@ better support later on as the website construction progresses.
 
 If you think this Framework is the solution you have been looking for, you can head over to
 the [wiki](https://github.com/vbounyasit/Rift-ETL/wiki) and start making your own ETL project based on Rift !
-
-&nbsp;
 
 ## Libraries used
 - [Apache Spark](https://spark.apache.org/)
