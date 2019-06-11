@@ -87,6 +87,7 @@ trait ETL[U, V] {
            table: String,
            optionalJobParameters: OptionalJobParameters[U, V]): Unit
 
+
   /**
     * The main method containing the logic for running our ETL job
     *

@@ -5,5 +5,9 @@ target
 spark_ui_events
 derby.log
 metastore_db/
-
 spark-warehouse/
+
+sample/
+jobs_params.conf
+sources.conf
+jobs/

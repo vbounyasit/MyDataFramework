@@ -4,7 +4,7 @@
 
     <groupId>io.github.vbounyasit</groupId>
     <artifactId>rift-etl</artifactId>
-    <version>1.8.1-SNAPSHOT</version>
+    <version>1.8.3-SNAPSHOT</version>
 
     <name>Rift</name>
     <description>A Scala ETL Framework based on Apache Spark for Data engineers.</description>

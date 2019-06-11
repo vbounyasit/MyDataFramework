@@ -48,6 +48,13 @@ object TransformOps {
     def ==>[V, W](target: V)(implicit appender: (U, V) => W): W = {
       appender(value, target)
     }
+
+    def join(joinWith: U, joiner: Joiner)(implicit transformOps: TransformOps[U]): EitherRP = {
+      transformOps.join(value, joinWith, joiner)
+    }
+    def union(unionWith: U)(implicit transformOps: TransformOps[U]): U = {
+      transformOps.union(value, unionWith)
+    }
   }
 
   implicit def transformersToPipeline: Seq[Transformer] => Pipeline = Pipeline(_: _*)
