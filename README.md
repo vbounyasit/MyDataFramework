@@ -1,7 +1,7 @@
-# Rift Framework
+# DataFlow Framework
 _A Scala ETL Framework based on [Apache Spark](https://spark.apache.org/) for Data engineers._
 
-The project has been released on Maven central ! See [Wiki pages](https://github.com/vbounyasit/Rift-ETL/wiki) to start right away.
+The project has been released on Maven central ! See [Wiki pages](https://github.com/vbounyasit/DataFlow/wiki) to start right away.
 
 ## Overview
 This is a project I have been working on for a few months, 
@@ -66,12 +66,12 @@ _Note : The requirements above might change, depending on people feedback and su
 &nbsp;
 
 ## Getting Started & Documentation
-The Rift Framework maintains reference documentation on
-Github [wiki pages](https://github.com/vbounyasit/Rift-ETL/wiki), and will have a 
+The DataFlow Framework maintains reference documentation on
+Github [wiki pages](https://github.com/vbounyasit/DataFlow/wiki), and will have a 
 better support later on as the website construction progresses.
 
 If you think this Framework is the solution you have been looking for, you can head over to
-the [wiki](https://github.com/vbounyasit/Rift-ETL/wiki) and start making your own ETL project based on Rift !
+the [wiki](https://github.com/vbounyasit/DataFlow/wiki) and start making your own ETL project based on DataFlow !
 
 ## Libraries used
 - [Apache Spark](https://spark.apache.org/)
@@ -93,4 +93,4 @@ in order to deepen my understanding of Spark and the Scala language, what better
 project from scratch?
 
 ## License
-The Rift Framework is released under version 2.0 of the [Apache License](http://www.apache.org/licenses/LICENSE-2.0).
+The DataFlow Framework is released under version 2.0 of the [Apache License](http://www.apache.org/licenses/LICENSE-2.0).

@@ -66,5 +66,4 @@ object UnitTestDefinition {
       new TransformationDef(transformers: Pipeline)
     }
   }
-
 }

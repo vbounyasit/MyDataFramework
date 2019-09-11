@@ -26,6 +26,7 @@ import com.vbounyasit.bigdata.transform.joiner.JoinerKeys.{CommonKey, JoinKey, K
 import com.vbounyasit.bigdata.utils.CollectionsUtils
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{Column, DataFrame}
+import com.vbounyasit.bigdata.transform.TransformOps._
 
 /**
   * A DataFrame with a set of transformations in a Pipeline object.
@@ -102,26 +103,34 @@ case class SourcePipeline(head: DataFrame, tail: Pipeline = Pipeline()) {
         renamingConf = commonKeys.map(_.key).map(key => (key, rightPrefix + key))
       )
 
-    def joinKeys: Seq[(String, String)] =
-      commonKeys.map(key => (leftPrefix + key, rightPrefix + key)) ++ keyProjections.map(key => (key.leftKey, key.rightKey))
+    def joinKeys: Seq[(String, String, String)] =
+      commonKeys.map(_.key).map(key => (leftPrefix + key, rightPrefix + key, key)) ++ keyProjections.map(key => KeyProjection.unapply(key).get)
 
     def initialJoinExpr: Column = joinExpr match {
       case None => lit(true)
       case Some(expr) => expr
     }
 
+    val postJoinKeyTransform: DataFrame => DataFrame = {
+      dataFrame => {
+        joinKeys.foldLeft(dataFrame) {
+          case (acc, (leftKey, rightKey, resultKey)) =>
+            acc.withColumnRenamed(leftKey, resultKey).drop(rightKey)
+        }
+      }
+    }
     val identityTransformation: DataFrame => DataFrame = df => df
     SourcePipeline(
       postTransformation.getOrElse(identityTransformation)(
         leftDF.join(rightDF,
           joinKeys.foldLeft(initialJoinExpr) {
-            case (acc, (leftKey, rightKey)) =>
+            case (acc, (leftKey, rightKey, _)) =>
               acc and col(leftKey) === col(rightKey)
           },
           jType
         )
       )
-    )
+    ) ==> postJoinKeyTransform
   }
 
   /**

@@ -95,7 +95,7 @@ abstract class ResourcesUpdater extends SparkSessionProvider with LoggerProvider
             (newDataFrame, logContent.getOrElse(none))
           case None => (createDefaultDataFrameFromConfigs(jobSource), s"Source created.")
         }
-        (jobSourceInfo, dataFrameToWrite, History(s"Sources Updates for [${jobSourceInfo.jobName}] ${jobSource.sourceName}", historyContent))
+        (jobSourceInfo, dataFrameToWrite.select(jobSource.selectedColumns.map(col): _*), History(s"Sources Updates for [${jobSourceInfo.jobName}] ${jobSource.sourceName}", historyContent))
     }
 
     /**

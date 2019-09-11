@@ -3,12 +3,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>io.github.vbounyasit</groupId>
-    <artifactId>rift-etl</artifactId>
+    <artifactId>dataflow</artifactId>
     <version>1.8.3-SNAPSHOT</version>
 
-    <name>Rift</name>
+    <name>dataflow</name>
     <description>A Scala ETL Framework based on Apache Spark for Data engineers.</description>
-    <url>https://github.com/vbounyasit/Rift-ETL</url>
+    <url>https://github.com/vbounyasit/DataFlow</url>
 
     <licenses>
         <license>
@@ -25,10 +25,10 @@
     </developers>
 
     <scm>
-        <connection>scm:git:git://github.com/vbounyasit/Rift-ETL.git</connection>
-        <developerConnection>scm:git:git@github.com:vbounyasit/Rift-ETL.git</developerConnection>
-        <url>http://github.com/vbounyasit/Rift-ETL/tree/master</url>
-      <tag>rift-etl-1.5</tag>
+        <connection>scm:git:git://github.com/vbounyasit/DataFlow.git</connection>
+        <developerConnection>scm:git:git@github.com:vbounyasit/DataFlow.git</developerConnection>
+        <url>http://github.com/vbounyasit/DataFlow/tree/master</url>
+      <tag>dataflow-1.5</tag>
   </scm>
 
     <properties>
