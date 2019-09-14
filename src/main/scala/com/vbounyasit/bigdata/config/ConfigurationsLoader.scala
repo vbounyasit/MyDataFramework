@@ -88,7 +88,7 @@ object ConfigurationsLoader {
     * @tparam T The Configuration case class type
     * @return Either the Configuration data or a configuration loading Exception
     */
-  def loadConfig[T](configName: String, config: Either[ConfigReaderFailures, _]): Either[ExceptionHandler, _] = {
+  def loadConfig[T](configName: String, config: Either[ConfigReaderFailures, T]): Either[ExceptionHandler, _] = {
     config
       .left
       .map(error => ConfigLoadingError(configName, error))

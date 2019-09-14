@@ -186,7 +186,7 @@ abstract class SparkApplication[U, V] extends SparkSessionProvider with ETL[U, V
 
 object SparkApplication {
 
-  trait OptionalData
+  sealed trait OptionalData
 
   case class ApplicationConfData[T](configName: String, either: Either[ConfigReaderFailures, T]) extends OptionalData
 
