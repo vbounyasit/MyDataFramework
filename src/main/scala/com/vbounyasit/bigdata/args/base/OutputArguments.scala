@@ -1,6 +1,6 @@
 /*
  * Developed by Vibert Bounyasit
- * Last modified 24/02/19 21:55
+ * Last modified 9/18/19 8:22 PM
  *
  * Copyright (c) 2019-present. All right reserved.
  *
@@ -17,9 +17,7 @@
  * limitations under the License.
  */
 
-package com.vbounyasit.bigdata.args
-
-import com.vbounyasit.bigdata.args.base.BaseArgument
+package com.vbounyasit.bigdata.args.base
 
 /**
   * The default arguments to be parsed
@@ -28,19 +26,7 @@ import com.vbounyasit.bigdata.args.base.BaseArgument
   * @param table    The output table to store the result(s) in
   * @param env      The environment which to extract the input sources from
   */
-case class DefaultArgument(database: String,
+case class OutputArguments(database: String,
                            table: String,
-                           env: String) extends BaseArgument[DefaultArgument] {
-  override def withDatabaseAndTable(value1: String, value2: String): DefaultArgument =
-    copy(database = value1, table = value2)
+                           env: String)
 
-  override def withEnv(value: String): DefaultArgument = copy(env = value)
-}
-
-object DefaultArgument {
-  def apply(): DefaultArgument =
-    DefaultArgument(
-      "N/A",
-      "N/A",
-      defaultEnv)
-}

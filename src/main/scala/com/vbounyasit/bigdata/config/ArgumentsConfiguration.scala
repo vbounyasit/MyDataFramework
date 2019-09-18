@@ -1,6 +1,6 @@
 /*
  * Developed by Vibert Bounyasit
- * Last modified 24/02/19 21:55
+ * Last modified 9/18/19 8:19 PM
  *
  * Copyright (c) 2019-present. All right reserved.
  *
@@ -17,10 +17,17 @@
  * limitations under the License.
  */
 
-package com.vbounyasit.bigdata.args.base
+package com.vbounyasit.bigdata.config
 
-trait BaseArgument[T] {
-  def withDatabaseAndTable(database: String, table: String): T
+import com.vbounyasit.bigdata.args.{ArgumentDefinition, ArgumentsParser}
 
-  def withEnv(value: String): T
+trait ArgumentsConfiguration[T] {
+
+  val name: String
+
+  val defaultArguments: T
+
+  val argumentsConfiguration: Map[String, ArgumentDefinition[T]]
+
+  lazy val argumentParser = new ArgumentsParser[T](name, defaultArguments, argumentsConfiguration)
 }

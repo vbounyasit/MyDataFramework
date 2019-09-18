@@ -1,6 +1,6 @@
 /*
  * Developed by Vibert Bounyasit
- * Last modified 24/02/19 21:55
+ * Last modified 9/18/19 8:19 PM
  *
  * Copyright (c) 2019-present. All right reserved.
  *
@@ -21,7 +21,7 @@ package com.vbounyasit.bigdata.testing
 
 import com.vbounyasit.bigdata.ETL.{ExecutionData, ExecutionParameters, OptionalJobParameters}
 import com.vbounyasit.bigdata.appImplicits._
-import com.vbounyasit.bigdata.args.DefaultArgument
+import com.vbounyasit.bigdata.args.base.OutputArguments
 import com.vbounyasit.bigdata.config.data.JobsConfig.JobConf
 import com.vbounyasit.bigdata.config.{ConfigsExtractor, ConfigurationsLoader}
 import com.vbounyasit.bigdata.exceptions.ExceptionHandler.ReadDataFramesFromFilesError
@@ -87,7 +87,7 @@ trait JobsTestGenerator extends TestComponents {
           val jobConf: JobConf = ConfigsExtractor.getJob(jobName, loadedConfigurations.jobsConf)
           val executionData = ExecutionData(
             loadedConfigurations,
-            DefaultArgument("job_results", jobName, environment),
+            OutputArguments("job_results", jobName, environment),
             optionalParameters,
             executionFunction,
             //adding in the job identifier, to be able to query the right table

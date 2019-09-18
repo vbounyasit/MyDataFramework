@@ -1,6 +1,6 @@
 /*
  * Developed by Vibert Bounyasit
- * Last modified 24/02/19 21:55
+ * Last modified 9/18/19 8:22 PM
  *
  * Copyright (c) 2019-present. All right reserved.
  *
@@ -21,22 +21,18 @@ package com.vbounyasit.bigdata
 
 import cats.implicits._
 import com.vbounyasit.bigdata.ETL.{ExecutionData, ExecutionParameters, OptionalJobParameters}
-import com.vbounyasit.bigdata.SparkApplication.ArgumentData
 import com.vbounyasit.bigdata.appImplicits._
-import com.vbounyasit.bigdata.args.base.BaseArgumentParser
-import com.vbounyasit.bigdata.args.{ArgumentsDefinition, DefaultArgument, ParserSetup}
+import com.vbounyasit.bigdata.args.base.OutputArgumentsConf
 import com.vbounyasit.bigdata.config.ConfigurationsLoader.loadConfig
 import com.vbounyasit.bigdata.config.data.JobsConfig.JobSource
 import com.vbounyasit.bigdata.config.data.SourcesConfig.SourcesConf
 import com.vbounyasit.bigdata.config.{ConfigDefinition, ConfigsExtractor, ConfigurationsLoader}
-import com.vbounyasit.bigdata.exceptions.ExceptionHandler.{ExecutionPlanNotFoundError, JobSourcesNotFoundError, ParseArgumentsError}
+import com.vbounyasit.bigdata.exceptions.ExceptionHandler.{ExecutionPlanNotFoundError, JobSourcesNotFoundError}
 import com.vbounyasit.bigdata.providers.{LoggerProvider, SparkSessionProvider}
 import com.vbounyasit.bigdata.transform.ExecutionPlan
 import com.vbounyasit.bigdata.utils.{DateUtils, MonadUtils}
 import org.apache.spark.sql.functions.lit
 import org.apache.spark.sql.{DataFrame, SparkSession}
-import pureconfig.error.ConfigReaderFailures
-import scopt.OParser
 
 /**
   * A class representing a submitted Spark application.
@@ -75,11 +71,10 @@ abstract class SparkApplication[U, V] extends SparkSessionProvider with ETL[U, V
         * Arguments parsing
         */
       parsedBaseArgument <- {
-        SparkApplication.parseArguments(
+        val argumentsConfiguration = new OutputArgumentsConf
+        argumentsConfiguration.argumentParser.parseArguments(
           loadedConfigurations.sparkParamsConf.appName,
-          args,
-          DefaultArgument(),
-          new BaseArgumentParser[DefaultArgument]
+          args
         )
       }
 
@@ -101,22 +96,20 @@ abstract class SparkApplication[U, V] extends SparkSessionProvider with ETL[U, V
         * Optional custom arguments
         */
       val spark: SparkSession = getSparkSession(loadedConfigurations.sparkParamsConf)
-      val parsedCustomArguments: Option[_] = executionParameters.additionalArguments.map {
-        case ArgumentData(defaultArgument, argumentSequence) =>
-          handleEither(
-            SparkApplication.parseArguments(
+      val parsedCustomArguments: Option[_] = executionParameters.additionalArguments.map(argsConf =>
+          {
+            val argumentParser = argsConf.argumentParser
+            argumentParser.parseArguments(
               loadedConfigurations.sparkParamsConf.appName,
-              args,
-              defaultArgument,
-              argumentSequence
+              args
             )
-          )
-      }
+          }
+      )
 
       /**
         * Optional Application config
         */
-      val applicationConf = configDefinition.applicationConf.map(conf =>
+      val customConfiguration: Option[_] = configDefinition.applicationConf.map(conf =>
         handleEither(loadConfig(conf.configName, conf.either))
       )
 
@@ -124,7 +117,7 @@ abstract class SparkApplication[U, V] extends SparkSessionProvider with ETL[U, V
       ExecutionData(
         loadedConfigurations,
         parsedBaseArgument,
-        OptionalJobParameters(applicationConf, parsedCustomArguments),
+        OptionalJobParameters(customConfiguration, parsedCustomArguments),
         executionParameters.executionFunction,
         jobConf,
         spark
@@ -188,17 +181,7 @@ object SparkApplication {
 
   sealed trait OptionalData
 
-  case class ApplicationConfData[T](configName: String, either: Either[ConfigReaderFailures, T]) extends OptionalData
+  case class ApplicationConfData[T](configName: String, either: PureConfigLoaded[T]) extends OptionalData
 
-  case class ArgumentData[T](defaultArgument: T, argumentSequence: ArgumentsDefinition[T]*) extends OptionalData
 
-  private def parseArguments[U](appName: String, args: Array[String], defaultArgument: U, parsers: ArgumentsDefinition[U]*): Either[ParseArgumentsError, U] = {
-    val argumentOption: Option[U] = OParser.parse(
-      ArgumentsDefinition.buildParser(appName, parsers: _*),
-      args,
-      defaultArgument,
-      new ParserSetup()
-    )
-    MonadUtils.optionToEither(argumentOption, ParseArgumentsError())
-  }
 }

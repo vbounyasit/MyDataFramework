@@ -1,6 +1,6 @@
 /*
  * Developed by Vibert Bounyasit
- * Last modified 24/02/19 21:55
+ * Last modified 9/18/19 6:56 PM
  *
  * Copyright (c) 2019-present. All right reserved.
  *
@@ -27,8 +27,12 @@ import com.vbounyasit.bigdata.ApplicationConf
   */
 trait ConfigDefinition {
 
+
   /**
     * An optional configuration file related to our application.
+    *
+    * Note: On the Application side, you can fill this parameter using the
+    * loadConfig function from pureconfig
     */
   val applicationConf: ApplicationConf[_] = None
 

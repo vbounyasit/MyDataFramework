@@ -1,6 +1,6 @@
 /*
  * Developed by Vibert Bounyasit
- * Last modified 24/02/19 21:55
+ * Last modified 9/18/19 8:19 PM
  *
  * Copyright (c) 2019-present. All right reserved.
  *
@@ -20,9 +20,8 @@
 package com.vbounyasit.bigdata
 
 import com.vbounyasit.bigdata.ETL.{ExecutionData, OptionalJobParameters}
-import com.vbounyasit.bigdata.SparkApplication.ArgumentData
-import com.vbounyasit.bigdata.args.DefaultArgument
-import com.vbounyasit.bigdata.config.ConfigurationsLoader
+import com.vbounyasit.bigdata.args.base.OutputArguments
+import com.vbounyasit.bigdata.config.{ArgumentsConfiguration, ConfigurationsLoader}
 import com.vbounyasit.bigdata.config.data.JobsConfig.{JobConf, JobSource}
 import com.vbounyasit.bigdata.config.data.SourcesConfig.SourcesConf
 import com.vbounyasit.bigdata.transform.ExecutionPlan
@@ -133,7 +132,7 @@ trait ETL[U, V] {
 object ETL {
 
   case class ExecutionData[Config, Argument, ConfigInput, ArgumentInput](configurations: ConfigurationsLoader,
-                                                                         baseArguments: DefaultArgument,
+                                                                         baseArguments: OutputArguments,
                                                                          optionalJobParameters: OptionalJobParameters[Config, Argument],
                                                                          executionFunction: OptionalJobParameters[ConfigInput, ArgumentInput] => ExecutionPlan,
                                                                          jobConf: JobConf,
@@ -143,7 +142,8 @@ object ETL {
                                                      arguments: Option[Argument])
 
   case class ExecutionParameters[Config, Argument](executionFunction: OptionalJobParameters[Config, Argument] => ExecutionPlan,
-                                                   additionalArguments: Option[ArgumentData[Argument]] = None)
+                                                   additionalArguments: Option[ArgumentsConfiguration[Argument]] = None)
+
 
   object ExecutionParameters {
     def apply[Config, Argument](executionPlan: ExecutionPlan): ExecutionParameters[Config, Argument] =
