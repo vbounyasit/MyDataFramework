@@ -3,6 +3,17 @@ _A Scala ETL Framework based on [Apache Spark](https://spark.apache.org/) for Da
 
 The project has been released on Maven central ! See [Wiki pages](https://github.com/vbounyasit/DataFlow/wiki) to start right away.
 
+## Getting started
+
+You can import this library by adding the following to the dependencies in your `pom.xml` file :
+```
+<dependency>
+    <groupId>io.github.vbounyasit</groupId>
+    <artifactId>dataflow</artifactId>
+    <version>1.1.0-SNAPSHOT</version>
+</dependency>
+```
+
 ## Overview
 This is a project I have been working on for a few months, 
 with the purpose of allowing **Data engineers** to write efficient, 
@@ -12,6 +23,8 @@ The main objective of this Framework is to make the engineer mainly focus on wri
 **Transformation** logic of large scale ETL projects, rather than writing the entire application layout over and over, 
 by providing only the necessary information for input data sources extraction, output data persistence, and writing 
 the data transformation logic.
+
+
 
 ## Context & Requirements
 _This section will cover the requirements as well as the main use case for this project to help you determine
