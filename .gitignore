@@ -10,4 +10,5 @@ spark-warehouse/
 sample/
 jobs_params.conf
 sources.conf
+application.conf
 jobs/

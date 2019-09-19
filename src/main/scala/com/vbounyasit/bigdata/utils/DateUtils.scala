@@ -1,6 +1,6 @@
 /*
  * Developed by Vibert Bounyasit
- * Last modified 24/02/19 21:55
+ * Last modified 4/7/19 7:15 PM
  *
  * Copyright (c) 2019-present. All right reserved.
  *
@@ -42,7 +42,7 @@ object DateUtils {
   def isValidDate(date: String, pattern: String): Boolean = {
     Try({
       val formatter = DateTimeFormatter.ofPattern(pattern)
-      date.format(formatter)
+      formatter.parse(date)
     }).isSuccess
   }
 }

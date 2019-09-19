@@ -1,6 +1,6 @@
 /*
  * Developed by Vibert Bounyasit
- * Last modified 4/7/19 7:15 PM
+ * Last modified 9/19/19 3:12 PM
  *
  * Copyright (c) 2019-present. All right reserved.
  *
@@ -17,34 +17,31 @@
  * limitations under the License.
  */
 
-package com.vbounyasit.bigdata.transform.joiner
-
-import com.vbounyasit.bigdata.transform.joiner.JoinerKeys.JoinKey
-import org.apache.spark.sql.{Column, DataFrame}
+package com.vbounyasit.bigdata.args
 
 /**
-  * Trait defining a join operation between two dataFrames/Pipelines
+  * A trait that contains all the defined configurations for command line argument parsing
+  * @tparam T The type of the Arguments object we will use in our processing plan
   */
-trait Joiner {
+trait ArgumentsConfiguration[T] {
 
   /**
-    * The join keys definition.
+    * The name of the set of arguments
     */
-  val keys: List[JoinKey]
+  val name: String
 
   /**
-    * The join type (Note : 'left' by default against 'inner' on spark default join function).
+    * The default argument (if none or not all of the arguments needed are provided)
     */
-  val joinType: String = "left"
+  val defaultArguments: T
 
   /**
-    * Additional predicates to add to the join operation.
+    * Mapping of the list of the arguments to provide
     */
-  val joinPredicate: Option[Column] = None
+  val argumentsConfiguration: Map[String, ArgumentDefinition[T]]
 
   /**
-    * An optional transformer that will be applied right after the join operation.
+    * The parser object
     */
-  val postJoinTransformer: Option[DataFrame => DataFrame] = None
-
+  lazy final val argumentParser = new ArgumentsParser[T](name, defaultArguments, argumentsConfiguration)
 }

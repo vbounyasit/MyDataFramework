@@ -1,6 +1,6 @@
 /*
  * Developed by Vibert Bounyasit
- * Last modified 24/02/19 21:55
+ * Last modified 9/18/19 8:22 PM
  *
  * Copyright (c) 2019-present. All right reserved.
  *
@@ -19,8 +19,14 @@
 
 package com.vbounyasit.bigdata.args.base
 
-trait BaseArgument[T] {
-  def withDatabaseAndTable(database: String, table: String): T
+/**
+  * The base arguments to be parsed
+  *
+  * @param database The output database to store the result(s) in
+  * @param table    The output table to store the result(s) in
+  * @param env      The environment which to extract the input sources from
+  */
+case class OutputArguments(database: String,
+                           table: String,
+                           env: String)
 
-  def withEnv(value: String): T
-}

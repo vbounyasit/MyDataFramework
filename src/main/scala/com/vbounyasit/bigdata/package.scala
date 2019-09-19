@@ -1,6 +1,6 @@
 /*
  * Developed by Vibert Bounyasit
- * Last modified 24/02/19 21:55
+ * Last modified 9/15/19 12:42 PM
  *
  * Copyright (c) 2019-present. All right reserved.
  *
@@ -23,12 +23,15 @@ import com.vbounyasit.bigdata.SparkApplication.ApplicationConfData
 import com.vbounyasit.bigdata.exceptions.ExceptionHandler
 import com.vbounyasit.bigdata.transform.ExecutionPlan
 import com.vbounyasit.bigdata.transform.pipeline.impl.SourcePipeline
+import pureconfig.error.ConfigReaderFailures
 
 package object bigdata {
+
   type Sources = Map[String, SourcePipeline]
   type ExecutionPlans = Map[String, ExecutionPlan]
   type EitherRP = Either[ExceptionHandler, SourcePipeline]
   type ApplicationConf[T] = Option[ApplicationConfData[T]]
+  type PureConfigLoaded[T] = Either[ConfigReaderFailures, T]
 
   case class DatePattern(pattern: String)
 
