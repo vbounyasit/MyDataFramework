@@ -62,7 +62,7 @@ abstract class SparkApplication[U, V] extends SparkSessionProvider with ETL[U, V
     */
   def loadExecutionData(args: Array[String]): ExecutionData[_, _, _, _] = {
     for {
-      /** -
+      /**
         * Loading configuration files
         */
       loadedConfigurations <- ConfigurationsLoader(configDefinition)
@@ -92,6 +92,7 @@ abstract class SparkApplication[U, V] extends SparkSessionProvider with ETL[U, V
         MonadUtils.optionToEither(executionPlans.get(jobName), ExecutionPlanNotFoundError(jobName))
       }
     } yield {
+
       /**
         * Optional custom arguments
         */
@@ -99,10 +100,10 @@ abstract class SparkApplication[U, V] extends SparkSessionProvider with ETL[U, V
       val parsedCustomArguments: Option[_] = executionParameters.additionalArguments.map(argsConf =>
           {
             val argumentParser = argsConf.argumentParser
-            argumentParser.parseArguments(
+            handleEither(argumentParser.parseArguments(
               loadedConfigurations.sparkParamsConf.appName,
               args
-            )
+            ))
           }
       )
 
@@ -178,10 +179,5 @@ abstract class SparkApplication[U, V] extends SparkSessionProvider with ETL[U, V
 }
 
 object SparkApplication {
-
-  sealed trait OptionalData
-
-  case class ApplicationConfData[T](configName: String, either: PureConfigLoaded[T]) extends OptionalData
-
-
+  case class ApplicationConfData[T](configName: String, either: PureConfigLoaded[T])
 }

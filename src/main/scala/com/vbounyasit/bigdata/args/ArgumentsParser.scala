@@ -41,13 +41,15 @@ class ArgumentsParser[T](name: String,
   import builder._
 
   /**
-    * @return The arguments preceded by the arguments definition name
+    * Builds the argument parsing sequence based on the provided configuration with OParser
+    * @param argsConfig A map with the correct argument definitions
+    * @return an OParser object that has all the parsing configurations setup
     */
   def buildArguments(argsConfig: Map[String, ArgumentDefinition[T]]): OParser[_, T] = {
     val parserSequence = argsConfig.map {
       case (key, value) =>
         val parsing: OParser[String, T] =
-          opt[String](name = key) required() action value.argumentMapping text value.description
+          opt[String](name = key) action value.argumentMapping text value.description
         if (value.paramValidation.isEmpty)
           parsing
         else
@@ -65,6 +67,12 @@ class ArgumentsParser[T](name: String,
     )
   }
 
+  /**
+    * Builds the final parser adding the app name and other meta info
+    * @param appName The application name
+    * @param argsConfig The argument definition map
+    * @return The result parser
+    */
   private def buildParser(appName: String,
                           argsConfig: Map[String, ArgumentDefinition[T]]): OParser[_, T] = {
     OParser.sequence(
@@ -74,6 +82,12 @@ class ArgumentsParser[T](name: String,
     )
   }
 
+  /**
+    * Parses A list of arguments provided through the command line in the 'main' method
+    * @param appName The application name
+    * @param args The args parameter provided by the main function
+    * @return Either the resulting Arguments object or an error
+    */
   def parseArguments(appName: String,
                      args: Array[String]): Either[ParseArgumentsError, T] = {
 

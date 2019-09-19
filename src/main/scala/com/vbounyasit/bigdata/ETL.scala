@@ -20,8 +20,9 @@
 package com.vbounyasit.bigdata
 
 import com.vbounyasit.bigdata.ETL.{ExecutionData, OptionalJobParameters}
+import com.vbounyasit.bigdata.args.ArgumentsConfiguration
 import com.vbounyasit.bigdata.args.base.OutputArguments
-import com.vbounyasit.bigdata.config.{ArgumentsConfiguration, ConfigurationsLoader}
+import com.vbounyasit.bigdata.config.ConfigurationsLoader
 import com.vbounyasit.bigdata.config.data.JobsConfig.{JobConf, JobSource}
 import com.vbounyasit.bigdata.config.data.SourcesConfig.SourcesConf
 import com.vbounyasit.bigdata.transform.ExecutionPlan

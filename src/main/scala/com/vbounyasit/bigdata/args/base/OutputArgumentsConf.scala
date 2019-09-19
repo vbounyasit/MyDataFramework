@@ -19,10 +19,13 @@
 
 package com.vbounyasit.bigdata.args.base
 
-import com.vbounyasit.bigdata.args.ArgumentDefinition
+import com.vbounyasit.bigdata.args.{ArgumentDefinition, ArgumentsConfiguration}
 import com.vbounyasit.bigdata.args.ArgumentDefinition.ParamValidation
-import com.vbounyasit.bigdata.config.ArgumentsConfiguration
 
+/**
+  * Base configuration for the command line arguments of our application
+  * These arguments are compulsory and will always be parsed.
+  */
 class OutputArgumentsConf extends ArgumentsConfiguration[OutputArguments]{
 
   override val name: String = "Output params"
@@ -33,7 +36,7 @@ class OutputArgumentsConf extends ArgumentsConfiguration[OutputArguments]{
     "default")
 
   override val argumentsConfiguration: Map[String, ArgumentDefinition[OutputArguments]] = Map(
-    "output_table" -> ArgumentDefinition(
+    "output-table" -> ArgumentDefinition(
       description = "The output table to write the result to. The argument format should be <database>.<table>",
       argumentMapping = (param, arguments) => {
         val split = param.split('.')

@@ -20,7 +20,6 @@
 package com.vbounyasit.bigdata
 
 import cats.kernel.Semigroup
-import com.vbounyasit.bigdata.SparkApplication.OptionalData
 import com.vbounyasit.bigdata.exceptions.ExceptionHandler.JobSourcesNotFoundError
 import com.vbounyasit.bigdata.transform.pipeline.impl.SourcePipeline
 import org.apache.spark.sql.DataFrame
@@ -44,6 +43,6 @@ object implicits {
     }
   }
 
-  implicit def toOption[T <: OptionalData](element: T): Option[T] = Some(element)
+  implicit def toOption[T](element: T): Option[T] = Some(element)
 
 }

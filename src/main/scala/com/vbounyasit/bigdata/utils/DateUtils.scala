@@ -42,7 +42,7 @@ object DateUtils {
   def isValidDate(date: String, pattern: String): Boolean = {
     Try({
       val formatter = DateTimeFormatter.ofPattern(pattern)
-      date.format(formatter)
+      formatter.parse(date)
     }).isSuccess
   }
 }

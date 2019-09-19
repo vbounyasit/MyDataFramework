@@ -20,7 +20,7 @@
 package com.vbounyasit.bigdata.args.base
 
 /**
-  * The default arguments to be parsed
+  * The base arguments to be parsed
   *
   * @param database The output database to store the result(s) in
   * @param table    The output table to store the result(s) in

@@ -1,6 +1,6 @@
 /*
  * Developed by Vibert Bounyasit
- * Last modified 9/18/19 8:19 PM
+ * Last modified 9/19/19 3:12 PM
  *
  * Copyright (c) 2019-present. All right reserved.
  *
@@ -17,17 +17,31 @@
  * limitations under the License.
  */
 
-package com.vbounyasit.bigdata.config
+package com.vbounyasit.bigdata.args
 
-import com.vbounyasit.bigdata.args.{ArgumentDefinition, ArgumentsParser}
-
+/**
+  * A trait that contains all the defined configurations for command line argument parsing
+  * @tparam T The type of the Arguments object we will use in our processing plan
+  */
 trait ArgumentsConfiguration[T] {
 
+  /**
+    * The name of the set of arguments
+    */
   val name: String
 
+  /**
+    * The default argument (if none or not all of the arguments needed are provided)
+    */
   val defaultArguments: T
 
+  /**
+    * Mapping of the list of the arguments to provide
+    */
   val argumentsConfiguration: Map[String, ArgumentDefinition[T]]
 
-  lazy val argumentParser = new ArgumentsParser[T](name, defaultArguments, argumentsConfiguration)
+  /**
+    * The parser object
+    */
+  lazy final val argumentParser = new ArgumentsParser[T](name, defaultArguments, argumentsConfiguration)
 }

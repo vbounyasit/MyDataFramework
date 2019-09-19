@@ -36,5 +36,10 @@ case class ArgumentDefinition[T](description: String,
 
 object ArgumentDefinition {
 
+  /**
+    * Validates a command line parameter
+    * @param validate The boolean function for validation
+    * @param failureMessage The failure message in case of non valid parameter
+    */
   case class ParamValidation(validate: String => Boolean, failureMessage: String)
 }
