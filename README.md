@@ -6,7 +6,7 @@ The project has been released on Maven central ! See [Wiki pages](https://github
 ## Getting started
 
 You can import this library by adding the following to the dependencies in your `pom.xml` file :
-```
+```xml
 <dependency>
     <groupId>io.github.vbounyasit</groupId>
     <artifactId>dataflow</artifactId>

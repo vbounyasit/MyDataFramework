@@ -111,7 +111,7 @@ abstract class SparkApplication[U, V] extends SparkSessionProvider with ETL[U, V
         * Optional Application config
         */
       val customConfiguration: Option[_] = configDefinition.applicationConf.map(conf =>
-        handleEither(loadConfig(conf.configName, conf.either))
+        handleEither(loadConfig(conf.configFileName, conf.pureconfigLoaded))
       )
 
       logger.info("Successfully loaded parameters from configuration files")
@@ -179,5 +179,5 @@ abstract class SparkApplication[U, V] extends SparkSessionProvider with ETL[U, V
 }
 
 object SparkApplication {
-  case class ApplicationConfData[T](configName: String, either: PureConfigLoaded[T])
+  case class ApplicationConfData[T](configFileName: String, pureconfigLoaded: PureConfigLoaded[T])
 }
