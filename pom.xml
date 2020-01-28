@@ -5,7 +5,7 @@
 
     <groupId>io.github.vbounyasit</groupId>
     <artifactId>dataflow</artifactId>
-    <version>1.1.0-SNAPT_SHOT</version>
+    <version>1.1.0</version>
 
     <name>dataflow</name>
     <description>A Scala ETL Framework based on Apache Spark for Data engineers.</description>
