@@ -3,6 +3,7 @@
 target
 *.iml
 spark_ui_events
+project
 derby.log
 metastore_db/
 spark-warehouse/
