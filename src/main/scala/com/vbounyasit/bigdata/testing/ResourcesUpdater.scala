@@ -124,7 +124,7 @@ abstract class ResourcesUpdater extends SparkSessionProvider with LoggerProvider
   /**
     * Main unit run method
     */
-  def run(): Unit = {
+  def runResourceUpdates(): Unit = {
     val loadedConfigurations = ConfigurationsLoader(sparkApplication.configDefinition, useLocalSparkParams = true)
 
     implicit val spark: SparkSession = getSparkSession(loadedConfigurations.sparkParamsConf)

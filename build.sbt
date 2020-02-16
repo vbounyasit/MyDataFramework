@@ -1,12 +1,11 @@
 name := "DataFlow"
 
-version := "1.0.0"
+version := "1.0.1-SNAPSHOT"
 
 scalaVersion := "2.11.12"
 
 scalacOptions += "-Ypartial-unification"
 
-useGpg := true
 credentials += Credentials(Path.userHome / ".sbt" / "sonatype_credentials")
 publishConfiguration := publishConfiguration.value.withOverwrite(true)
 
@@ -17,7 +16,7 @@ libraryDependencies += "org.apache.spark" %% "spark-core" % "2.2.1"
 // https://mvnrepository.com/artifact/org.apache.spark/spark-sql
 libraryDependencies += "org.apache.spark" %% "spark-sql" % "2.2.1"
 // https://mvnrepository.com/artifact/org.apache.spark/spark-hive
-libraryDependencies += "org.apache.spark" %% "spark-hive" % "2.2.1" % "provided"
+libraryDependencies += "org.apache.spark" %% "spark-hive" % "2.2.1"
 // https://mvnrepository.com/artifact/com.typesafe/config
 libraryDependencies += "com.typesafe" % "config" % "1.3.2"
 // https://mvnrepository.com/artifact/org.scalatest/scalatest

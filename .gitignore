@@ -8,7 +8,7 @@ derby.log
 metastore_db/
 spark-warehouse/
 
-sample/
+example/
 jobs_params.conf
 sources.conf
 application.conf

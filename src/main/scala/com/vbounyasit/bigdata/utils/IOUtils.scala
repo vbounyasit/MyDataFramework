@@ -59,7 +59,7 @@ object IOUtils {
     * Returns the path to the resources package
     */
   val resourcesPath: String = {
-    val basePath = this.getClass.getResource("/sources.conf").getPath.split("/").dropRight(3).mkString("/")
+    val basePath = this.getClass.getResource("/sources.conf").getPath.split("/").dropRight(4).mkString("/")
     val resourcePath = s"$basePath/src/test/resources"
     resourcePath
   }

@@ -20,7 +20,9 @@
 package com.vbounyasit.bigdata
 
 import cats.kernel.Semigroup
+import com.vbounyasit.bigdata.ETL.{ExecutionConfig, ExecutionParameters}
 import com.vbounyasit.bigdata.exceptions.ExceptionHandler.JobSourcesNotFoundError
+import com.vbounyasit.bigdata.transform.ExecutionPlan
 import com.vbounyasit.bigdata.transform.pipeline.impl.SourcePipeline
 import org.apache.spark.sql.DataFrame
 
@@ -44,5 +46,7 @@ object implicits {
   }
 
   implicit def toOption[T](element: T): Option[T] = Some(element)
+
+  implicit def toExecutionConfig(executionPlan: ExecutionPlan): ExecutionConfig = ExecutionParameters(executionPlan)
 
 }
