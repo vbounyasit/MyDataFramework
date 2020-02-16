@@ -117,6 +117,13 @@ object TransformOps {
       } yield pipeline1 union pipeline2
   }
 
+  /**
+    * Converters
+    */
+  implicit def toTransformer(function: DataFrame => DataFrame): Transformer = new Transformer {
+    override def transform(dataFrame: DataFrame): DataFrame = function(dataFrame)
+  }
+
 }
 
 

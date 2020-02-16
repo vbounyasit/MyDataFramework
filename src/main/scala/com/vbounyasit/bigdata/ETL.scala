@@ -132,6 +132,10 @@ trait ETL[U, V] {
   */
 object ETL {
 
+  type ExecutionConfig = ExecutionParameters[_, _]
+
+  type EmptyOptionalParameters = OptionalJobParameters[Nothing, Nothing]
+
   case class ExecutionData[Config, Argument, ConfigInput, ArgumentInput](configurations: ConfigurationsLoader,
                                                                          baseArguments: OutputArguments,
                                                                          optionalJobParameters: OptionalJobParameters[Config, Argument],
