@@ -26,8 +26,6 @@ import com.vbounyasit.bigdata.ApplicationConf
   * Everything related to configuration files loading is handled here.
   */
 trait ConfigDefinition {
-
-
   /**
     * An optional configuration file related to our application.
     *
@@ -55,6 +53,8 @@ trait ConfigDefinition {
     * The configuration for the different jobs we have.
     */
   val jobsConf: Config
+
+
 
 
 }

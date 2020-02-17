@@ -155,6 +155,7 @@ trait JobsTestGenerator extends TestComponents {
             executionData.baseArguments.table,
             sources,
             executionFunction(optionalParameters),
+            Some(executionData.jobConf.outputMetadata.outputColumns),
             None
           )
 
