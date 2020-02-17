@@ -30,5 +30,5 @@ trait TestComponents extends FlatSpec with Matchers with SparkSessionProvider wi
   /**
     * The test execution
     */
-  def executeTests(): Unit
+  def executeTests(env: String): Unit
 }

@@ -20,7 +20,7 @@
 package com.vbounyasit.bigdata
 
 import cats.implicits._
-import com.vbounyasit.bigdata.ETL.{ExecutionConfig, ExecutionData, ExecutionParameters, OptionalJobParameters}
+import com.vbounyasit.bigdata.ETL.{ExecutionConfig, ExecutionData, OptionalJobParameters}
 import com.vbounyasit.bigdata.appImplicits._
 import com.vbounyasit.bigdata.args.base.OutputArgumentsConf
 import com.vbounyasit.bigdata.config.ConfigurationsLoader.loadConfig
@@ -92,7 +92,6 @@ abstract class SparkApplication[U, V] extends SparkSessionProvider with ETL[U, V
         MonadUtils.optionToEither(executionPlans.get(jobName), ExecutionPlanNotFoundError(jobName))
       }
     } yield {
-
       /**
         * Optional custom arguments
         */

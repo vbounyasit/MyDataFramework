@@ -22,7 +22,7 @@ package com.vbounyasit.bigdata
 import org.apache.spark.sql.types.StringType
 
 package object testing {
-  val environment = "prod"
+  val environment = "default"
   val defaultSourceRowCount = 2
   val defaultColumnValue = "TO_FILL"
   val defaultColumnType: StringType.type = StringType

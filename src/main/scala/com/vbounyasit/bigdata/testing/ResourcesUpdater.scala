@@ -124,7 +124,7 @@ abstract class ResourcesUpdater extends SparkSessionProvider with LoggerProvider
   /**
     * Main unit run method
     */
-  def runResourceUpdates(): Unit = {
+  def runResourceUpdates(env: String = environment): Unit = {
     val loadedConfigurations = ConfigurationsLoader(sparkApplication.configDefinition, useLocalSparkParams = true)
 
     implicit val spark: SparkSession = getSparkSession(loadedConfigurations.sparkParamsConf)
@@ -132,7 +132,7 @@ abstract class ResourcesUpdater extends SparkSessionProvider with LoggerProvider
     val sourcesToUpdate: List[Validated[JobSourcesNotFoundError, (JobTableMetadata, JobSource)]] = loadedConfigurations.jobsConf.jobs.flatMap {
       case (jobName, jobConf) =>
         jobConf.sources.map(jobSource => {
-          ConfigsExtractor.matchJobSourceWithSources(jobName, jobSource, loadedConfigurations.sourcesConf, environment) {
+          ConfigsExtractor.matchJobSourceWithSources(jobName, jobSource, loadedConfigurations.sourcesConf, env) {
             case (database, table) =>
               (JobTableMetadata(jobName, database, table), jobSource)
           }

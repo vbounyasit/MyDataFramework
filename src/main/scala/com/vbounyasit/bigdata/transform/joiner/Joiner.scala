@@ -19,13 +19,30 @@
 
 package com.vbounyasit.bigdata.transform.joiner
 
-import com.vbounyasit.bigdata.transform.joiner.JoinerKeys.JoinKey
+import com.vbounyasit.bigdata.transform.joiner.JoinerKeys.{CommonKey, JoinKey, KeyProjection}
 import org.apache.spark.sql.{Column, DataFrame}
 
 /**
   * Trait defining a join operation between two dataFrames/Pipelines
   */
 trait Joiner {
+
+  /**
+    * Implicitly converts strings to a CommonKey object
+    * @param key the key we want to use
+    * @return the CommonKey object
+    */
+  implicit def toCommonKey(key: String): CommonKey = CommonKey(key)
+
+  /**
+    * Implicitly converts a (left, right) -> result data format into a KeyProjection object
+    * @param keys the keys to convert
+    * @return The KeyProjection object
+    */
+  implicit def toKeyProjection(keys: ((String, String), String)): KeyProjection = {
+    val ((leftKey, rightKey), resultKey) = keys
+    KeyProjection(leftKey, rightKey, resultKey)
+  }
 
   /**
     * The join keys definition.
