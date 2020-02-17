@@ -27,6 +27,7 @@ import com.vbounyasit.bigdata.ApplicationConf
   */
 trait ConfigDefinition {
 
+  implicit def toOptionalOutputTables(tables: Seq[(String, String)]): Option[Seq[(String, String)]] = Some(tables)
 
   /**
     * An optional configuration file related to our application.
@@ -55,6 +56,11 @@ trait ConfigDefinition {
     * The configuration for the different jobs we have.
     */
   val jobsConf: Config
+
+  /**
+    * The output tables and jobs to run
+    */
+  val getResultingTables: Option[Seq[(String, String)]] = None
 
 
 }

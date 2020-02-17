@@ -23,23 +23,26 @@ import com.vbounyasit.bigdata.args.ArgumentDefinition.ParamValidation
 
 /**
   * A definition for each arguments provided in the command line while submitting the Spark job
+  *
   * @param argumentMapping A function of that will construct the argument case class that will be used
   *                        in your job.
   *                        NB: (arg, Arguments object) => Arguments object
-  * @param description The description of the argument parameter
+  * @param description     The description of the argument parameter
   * @param paramValidation A function that validates the format of the argument provided
   * @tparam T The Arguments object
   */
 case class ArgumentDefinition[T](description: String,
-                                              argumentMapping: (String, T) => T,
-                                              paramValidation: Option[ParamValidation] = None)
+                                 argumentMapping: (String, T) => T,
+                                 paramValidation: Option[ParamValidation] = None)
 
 object ArgumentDefinition {
 
   /**
     * Validates a command line parameter
-    * @param validate The boolean function for validation
+    *
+    * @param validate       The boolean function for validation
     * @param failureMessage The failure message in case of non valid parameter
     */
   case class ParamValidation(validate: String => Boolean, failureMessage: String)
+
 }

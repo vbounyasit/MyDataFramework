@@ -71,6 +71,7 @@ trait ETL[U, V] {
   def transform(jobName: String,
                 sources: Sources,
                 executionPlan: ExecutionPlan,
+                outputColumns: Option[Seq[String]],
                 exportDateColumn: Option[String])(implicit spark: SparkSession): DataFrame
 
   /**
@@ -115,6 +116,7 @@ trait ETL[U, V] {
           executionData.optionalJobParameters.arguments.map(_.asInstanceOf[ArgumentInput])
         )
       ),
+      Some(executionData.jobConf.outputMetadata.outputColumns),
       Some(executionData.jobConf.outputMetadata.dateColumn)
     )
     //load

@@ -45,7 +45,7 @@ trait UnitTestGenerator extends TestComponents {
   /**
     * The test execution
     */
-  override final def executeTests(): Unit = {
+  override final def executeTests(env: String = environment): Unit = {
     val loadedSparkConf: SparkParamsConf = ConfigurationsLoader.loadConfig[SparkParamsConf](
       "Spark local conf",
       ConfigFactory.load("spark_params_local")

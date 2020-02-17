@@ -25,7 +25,7 @@ object JobsConfig {
 
   case class JobConf(outputMetadata: OutputMetaData, sources: List[JobSource])
 
-  case class OutputMetaData(testIdColumn: String = "", dateColumn: String = "")
+  case class OutputMetaData(testIdColumn: String = "", dateColumn: String = "", outputColumns: Seq[String] = Seq())
 
   case class JobSource(sourceName: String, selectedColumns: List[String], dropDuplicates: Boolean = true)
 

@@ -20,7 +20,7 @@
 package com.vbounyasit.bigdata
 
 import cats.implicits._
-import com.vbounyasit.bigdata.ETL.{ExecutionConfig, ExecutionData, ExecutionParameters, OptionalJobParameters}
+import com.vbounyasit.bigdata.ETL.{ExecutionConfig, ExecutionData, OptionalJobParameters}
 import com.vbounyasit.bigdata.appImplicits._
 import com.vbounyasit.bigdata.args.base.OutputArgumentsConf
 import com.vbounyasit.bigdata.config.ConfigurationsLoader.loadConfig
@@ -33,6 +33,7 @@ import com.vbounyasit.bigdata.transform.ExecutionPlan
 import com.vbounyasit.bigdata.utils.{DateUtils, MonadUtils}
 import org.apache.spark.sql.functions.lit
 import org.apache.spark.sql.{DataFrame, SparkSession}
+import org.apache.spark.sql.functions._
 
 /**
   * A class representing a submitted Spark application.
@@ -92,19 +93,17 @@ abstract class SparkApplication[U, V] extends SparkSessionProvider with ETL[U, V
         MonadUtils.optionToEither(executionPlans.get(jobName), ExecutionPlanNotFoundError(jobName))
       }
     } yield {
-
       /**
         * Optional custom arguments
         */
       val spark: SparkSession = getSparkSession(loadedConfigurations.sparkParamsConf)
-      val parsedCustomArguments: Option[_] = executionParameters.additionalArguments.map(argsConf =>
-          {
-            val argumentParser = argsConf.argumentParser
-            handleEither(argumentParser.parseArguments(
-              loadedConfigurations.sparkParamsConf.appName,
-              args
-            ))
-          }
+      val parsedCustomArguments: Option[_] = executionParameters.additionalArguments.map(argsConf => {
+        val argumentParser = argsConf.argumentParser
+        handleEither(argumentParser.parseArguments(
+          loadedConfigurations.sparkParamsConf.appName,
+          args
+        ))
+      }
       )
 
       /**
@@ -157,10 +156,18 @@ abstract class SparkApplication[U, V] extends SparkSessionProvider with ETL[U, V
   override def transform(jobName: String,
                          sources: Sources,
                          executionPlan: ExecutionPlan,
+                         outputColumns: Option[Seq[String]],
                          exportDateColumn: Option[String])(implicit spark: SparkSession): DataFrame = {
 
     def getSource(sourceName: String): EitherRP = {
       MonadUtils.optionToEither(sources.get(sourceName), JobSourcesNotFoundError(jobName, sourceName))
+    }
+
+    def selectOutputColumns: DataFrame => DataFrame = dataFrame => {
+      outputColumns match {
+        case Some(columns) => dataFrame.select(columns.map(col): _*)
+        case None => dataFrame
+      }
     }
 
     def attachExportDate: DataFrame => DataFrame = dataFrame => {
@@ -169,15 +176,19 @@ abstract class SparkApplication[U, V] extends SparkSessionProvider with ETL[U, V
         case None => dataFrame
       }
     }
-
-    attachExportDate(executionPlan
-      .getExecutionPlan(getSource)
-      .info("Successfully loaded Execution plan for data transformation")
-      .transform)
+    selectOutputColumns(
+      attachExportDate(
+        executionPlan
+          .getExecutionPlan(getSource)
+          .info("Successfully loaded Execution plan for data transformation")
+          .transform
+      )
+    )
   }
-
 }
 
 object SparkApplication {
+
   case class ApplicationConfData[T](configFileName: String, pureconfigLoaded: PureConfigLoaded[T])
+
 }

@@ -34,7 +34,7 @@ class JsonDfWriter extends DataFrameWriter("json") {
 
     s"[${toJsonWithFilledNulls(dataFrame).mkString(",")}]"
       .replaceAll(",", ",\n  ")
-      .replaceAll(":", ": ")
+      .replaceAll("\":\"", "\": \"")
       .replace("},\n  ", "},")
       .replace("}", "\n}")
       .replace("{", "{\n  ")

@@ -47,7 +47,7 @@ class HiveEnvironment(val dataFrameLoader: DataFrameLoader) extends LoggerProvid
     *
     * @param sourcesConf the source configuration
     */
-  def setupEnvironment(jobsConf: JobsConf, sourcesConf: SourcesConf)(implicit spark: SparkSession): Unit = {
+  def setupEnvironment(jobsConf: JobsConf, sourcesConf: SourcesConf, env: String = environment)(implicit spark: SparkSession): Unit = {
     Try {
       logger.info("Creating the required databases.")
       sourcesConf.databases.flatMap {

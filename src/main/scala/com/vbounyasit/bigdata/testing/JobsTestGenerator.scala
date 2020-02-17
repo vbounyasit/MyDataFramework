@@ -67,14 +67,14 @@ trait JobsTestGenerator extends TestComponents {
   /**
     * Executing the tests.
     */
-  override final def executeTests(): Unit = {
+  override final def executeTests(env: String = environment): Unit = {
     val loadedConfigurations = ConfigurationsLoader(sparkApplication.configDefinition, useLocalSparkParams = true)
       .info("Successfully loaded configurations for local run.")
 
     implicit val spark: SparkSession = getSparkSession(loadedConfigurations.sparkParamsConf)
 
     "Hive Environment" should "successfully setup all the required source tables" in {
-      hiveEnvironment.setupEnvironment(loadedConfigurations.jobsConf, loadedConfigurations.sourcesConf)
+      hiveEnvironment.setupEnvironment(loadedConfigurations.jobsConf, loadedConfigurations.sourcesConf, env)
       logger.info("Hive environment successfully setup")
     }
 
@@ -87,7 +87,7 @@ trait JobsTestGenerator extends TestComponents {
           val jobConf: JobConf = ConfigsExtractor.getJob(jobName, loadedConfigurations.jobsConf)
           val executionData = ExecutionData(
             loadedConfigurations,
-            OutputArguments("job_results", jobName, environment),
+            OutputArguments("job_results", jobName, env),
             optionalParameters,
             executionFunction,
             //adding in the job identifier, to be able to query the right table
@@ -155,6 +155,7 @@ trait JobsTestGenerator extends TestComponents {
             executionData.baseArguments.table,
             sources,
             executionFunction(optionalParameters),
+            Some(executionData.jobConf.outputMetadata.outputColumns),
             None
           )
 
