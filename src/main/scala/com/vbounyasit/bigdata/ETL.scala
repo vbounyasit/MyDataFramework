@@ -21,7 +21,6 @@ package com.vbounyasit.bigdata
 
 import com.vbounyasit.bigdata.ETL.{ExecutionData, JobFullExecutionParameters, OptionalJobParameters}
 import com.vbounyasit.bigdata.args.ArgumentsConfiguration
-import com.vbounyasit.bigdata.args.base.OutputArguments
 import com.vbounyasit.bigdata.config.ConfigurationsLoader
 import com.vbounyasit.bigdata.config.data.JobsConfig.{JobConf, JobSource}
 import com.vbounyasit.bigdata.config.data.SourcesConfig.SourcesConf
@@ -158,15 +157,6 @@ object ETL {
                                                    additionalArguments: Option[ArgumentsConfiguration[Argument]] = None)
 
   case class TableMetadata(database: String, table: String)
-
-  object JobFullExecutionParameters {
-    def applyExistential[Config, Argument, ConfigInput, ArgumentInput](jobConf: JobConf,
-                                                                       outputTable: TableMetadata,
-                                                                       optionalJobParameters: OptionalJobParameters[Config, Argument],
-                                                                       executionFunction: OptionalJobParameters[ConfigInput, ArgumentInput] => ExecutionPlan): JobFullExecutionParameters[_, _, _, _] = {
-      this.apply(jobConf, outputTable, optionalJobParameters, executionFunction)
-    }
-  }
 
   object ExecutionParameters {
     def apply[Config, Argument](executionPlan: ExecutionPlan): ExecutionParameters[Config, Argument] =

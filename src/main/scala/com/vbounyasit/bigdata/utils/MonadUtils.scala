@@ -19,14 +19,22 @@
 
 package com.vbounyasit.bigdata.utils
 
-import com.vbounyasit.bigdata.exceptions.ExceptionHandler
 import cats.implicits._
 import com.vbounyasit.bigdata.ExceptionWithMessage
+import com.vbounyasit.bigdata.exceptions.ExceptionHandler
 
 /**
   * Utilities related to Monad operations
   */
 object MonadUtils {
+
+  /**
+    * Automatically handle either exceptions
+    */
+  def handleEither[T](either: Either[ExceptionHandler, T]): T = either match {
+    case Right(result) => result
+    case Left(error) => throw error
+  }
 
   def optionToEither[T, V <: ExceptionHandler](option: Option[T], left: V): Either[V, T] = {
     Either.cond(option.isDefined, option.get, left)

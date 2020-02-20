@@ -19,9 +19,8 @@
 
 package com.vbounyasit.bigdata.testing
 
-import com.vbounyasit.bigdata.ETL.{ExecutionData, ExecutionParameters, OptionalJobParameters}
+import com.vbounyasit.bigdata.ETL.{ExecutionParameters, OptionalJobParameters}
 import com.vbounyasit.bigdata.appImplicits._
-import com.vbounyasit.bigdata.args.base.OutputArguments
 import com.vbounyasit.bigdata.config.data.JobsConfig.JobConf
 import com.vbounyasit.bigdata.config.{ConfigsExtractor, ConfigurationsLoader}
 import com.vbounyasit.bigdata.exceptions.ExceptionHandler.ReadDataFramesFromFilesError
@@ -78,31 +77,26 @@ trait JobsTestGenerator extends TestComponents {
       logger.info("Hive environment successfully setup")
     }
 
-    val executionPlans = sparkApplication.executionPlans
     val optionalParameters: OptionalJobParameters[Any, Any] = OptionalJobParameters(defaultApplicationConf, defaultCustomArgument)
 
-    /*executionPlans.foreach {
-      case (jobName, ExecutionParameters(executionFunction, _)) =>
+    sparkApplication.executionPlans.foreach {
+      case (jobName, ExecutionParameters(executionFunction, _)) => {
         s"${jobName.capitalize}" should "Compute the right Result" in {
-          val jobConf: JobConf = ConfigsExtractor.getJob(jobName, loadedConfigurations.jobsConf)
-          val executionData = ExecutionData(
-            loadedConfigurations,
-            OutputArguments("job_results", jobName, env),
-            optionalParameters,
-            executionFunction,
-            //adding in the job identifier, to be able to query the right table
-            jobConf.copy(sources =
-              jobConf.sources.map(source => source.copy(
-                sourceName = s"${jobName}_${source.sourceName}")
-              )
-            ),
-            spark
+          /**
+            * Extracting the job configuration
+            */
+          val extractedJobConf = ConfigsExtractor
+            .getJob(jobName, loadedConfigurations.jobsConf)
+          val jobConf: JobConf = extractedJobConf.copy(sources =
+            extractedJobConf.sources.map(source => source.copy(
+              sourceName = s"${jobName}_${source.sourceName}")
+            )
           )
 
           /**
             * Loading our Expected output DataFrame from resources file
             */
-          val outputJobTableMetadata: JobTableMetadata = JobTableMetadata(jobName, executionData.baseArguments.database, executionData.baseArguments.table)
+          val outputJobTableMetadata: JobTableMetadata = JobTableMetadata(jobName, "job_results", jobName)
           val loadedOutputDataFrame: Either[ReadDataFramesFromFilesError, DataFrame] =
             hiveEnvironment.dataFrameLoader.loadDataFrames(Seq(outputJobTableMetadata), "out") match {
               case List(eitherDf) => eitherDf.right.map(_._2)
@@ -114,11 +108,11 @@ trait JobsTestGenerator extends TestComponents {
           //extract
           //todo figure out why the row order is changed after extraction
           val sources: Sources = sparkApplication.extract(
-            executionData.baseArguments.table,
-            executionData.jobConf.sources,
+            jobName,
+            jobConf.sources,
             {
               //adding in the job identifier, to be able to query the right table
-              val sourcesConf = executionData.configurations.sourcesConf
+              val sourcesConf = loadedConfigurations.sourcesConf
               sourcesConf.copy(tables =
                 sourcesConf.tables.map {
                   case (sourceName, tableInfo) =>
@@ -126,11 +120,11 @@ trait JobsTestGenerator extends TestComponents {
                 }
               )
             },
-            executionData.baseArguments.env)
+            env)
             //removing that job name identifier from the source names, since we don't want it there
             .map {
-            case (sourceName, pipeline) => (sourceName.replace(s"${jobName}_", ""), pipeline)
-          }
+              case (sourceName, pipeline) => (sourceName.replace(s"${jobName}_", ""), pipeline)
+            }
 
           /**
             * Checking the resources files for unfilled source column values
@@ -152,10 +146,10 @@ trait JobsTestGenerator extends TestComponents {
             */
           //transform
           val resultDataFrame = sparkApplication.transform(
-            executionData.baseArguments.table,
+            jobName,
             sources,
             executionFunction(optionalParameters),
-            Some(executionData.jobConf.outputMetadata.outputColumns),
+            Some(jobConf.outputMetadata.outputColumns),
             None
           )
 
@@ -226,7 +220,8 @@ trait JobsTestGenerator extends TestComponents {
               fail("No output file could be read for this Job. Creating a file from the result obtained in this test.")
           }
         }
-    }*/
+      }
+    }
   }
 
   /**

@@ -19,8 +19,8 @@
 
 package com.vbounyasit.bigdata.args.base
 
-import com.vbounyasit.bigdata.args.{ArgumentDefinition, ArgumentsConfiguration}
 import com.vbounyasit.bigdata.args.ArgumentDefinition.ParamValidation
+import com.vbounyasit.bigdata.args.{ArgumentDefinition, ArgumentsConfiguration}
 
 /**
   * Base configuration for the command line arguments of our application

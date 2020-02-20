@@ -20,7 +20,6 @@
 package com.vbounyasit.bigdata.testing
 
 import com.typesafe.config.ConfigFactory
-import com.vbounyasit.bigdata.appImplicits._
 import com.vbounyasit.bigdata.config.ConfigurationsLoader
 import com.vbounyasit.bigdata.config.data.SparkParamsConf
 import com.vbounyasit.bigdata.testing.common.TestComponents

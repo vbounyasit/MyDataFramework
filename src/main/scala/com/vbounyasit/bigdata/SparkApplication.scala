@@ -22,7 +22,7 @@ package com.vbounyasit.bigdata
 import cats.implicits._
 import com.vbounyasit.bigdata.ETL._
 import com.vbounyasit.bigdata.appImplicits._
-import com.vbounyasit.bigdata.args.base.{OutputArguments, OutputArgumentsConf}
+import com.vbounyasit.bigdata.args.base.OutputArgumentsConf
 import com.vbounyasit.bigdata.config.ConfigurationsLoader.loadConfig
 import com.vbounyasit.bigdata.config.data.JobsConfig.{JobConf, JobSource}
 import com.vbounyasit.bigdata.config.data.SourcesConfig.SourcesConf
@@ -30,7 +30,8 @@ import com.vbounyasit.bigdata.config.{ConfigDefinition, ConfigsExtractor, Config
 import com.vbounyasit.bigdata.exceptions.ExceptionHandler._
 import com.vbounyasit.bigdata.providers.{LoggerProvider, SparkSessionProvider}
 import com.vbounyasit.bigdata.transform.ExecutionPlan
-import com.vbounyasit.bigdata.utils.{CollectionsUtils, DateUtils, MonadUtils}
+import com.vbounyasit.bigdata.utils.MonadUtils._
+import com.vbounyasit.bigdata.utils.{CollectionsUtils, DateUtils}
 import org.apache.spark.sql.functions.{lit, _}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
@@ -96,7 +97,7 @@ abstract class SparkApplication[U, V] extends SparkSessionProvider with ETL[U, V
           }
           case resultingTables => resultingTables.map(TableMetadataSeq)
         }
-        MonadUtils.optionToEither(output, NoOutputTablesSpecified())
+        optionToEither(output, NoOutputTablesSpecified())
       }
 
       /**
@@ -113,8 +114,7 @@ abstract class SparkApplication[U, V] extends SparkSessionProvider with ETL[U, V
         */
       executionsParameters <- {
         implicit val spark: SparkSession = getSparkSession(loadedConfigurations.sparkParamsConf)
-        MonadUtils
-          .getMapSubList(tablesToCompute.tables.map(_.table).toList, executionPlans, ExecutionPlanNotFoundError)
+        getMapSubList(tablesToCompute.tables.map(_.table).toList, executionPlans, ExecutionPlanNotFoundError)
           .map(ExecutionParametersMap)
       }
     } yield {
@@ -205,7 +205,7 @@ abstract class SparkApplication[U, V] extends SparkSessionProvider with ETL[U, V
                          exportDateColumn: Option[String])(implicit spark: SparkSession): DataFrame = {
 
     def getSource(sourceName: String): EitherRP = {
-      MonadUtils.optionToEither(sources.get(sourceName), JobSourcesNotFoundError(jobName, sourceName))
+      optionToEither(sources.get(sourceName), JobSourcesNotFoundError(jobName, sourceName))
     }
 
     def selectOutputColumns: DataFrame => DataFrame = dataFrame => {

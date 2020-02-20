@@ -19,8 +19,7 @@
 
 package com.vbounyasit.bigdata
 
-import cats.Monad
-import cats.kernel.{Monoid, Semigroup}
+import cats.kernel.Semigroup
 import com.vbounyasit.bigdata.ETL.{ExecutionConfig, ExecutionParameters}
 import com.vbounyasit.bigdata.exceptions.ExceptionHandler.JobSourcesNotFoundError
 import com.vbounyasit.bigdata.transform.ExecutionPlan
