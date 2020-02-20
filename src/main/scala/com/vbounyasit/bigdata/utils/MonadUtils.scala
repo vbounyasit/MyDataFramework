@@ -33,10 +33,10 @@ object MonadUtils {
   }
 
   def getMapSubList[K, V, Error <: ExceptionHandler](keySubSeq: List[K], dataMap: Map[K, V], errorNotFound: ExceptionWithMessage[Error])(implicit keyConverter: K => String): Either[Error, Map[K, V]] = {
-    def toEither[U](option: Option[(K, U)]): Either[Error, (K, U)] = Either.cond(option.isDefined, option.get, errorNotFound(keyConverter(option.get._1)))
+    def toEither[U](key: K, option: Option[(K, U)]): Either[Error, (K, U)] = Either.cond(option.isDefined, option.get, errorNotFound(keyConverter(key)))
     keySubSeq
-      .map(key => dataMap.get(key).map(key -> _))
-      .map(toEither)
+      .map(key => (key, dataMap.get(key).map(key -> _)))
+      .map(e => toEither(e._1, e._2))
       .sequence.map(_.toMap)
   }
 }

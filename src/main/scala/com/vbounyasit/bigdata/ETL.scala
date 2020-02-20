@@ -19,7 +19,7 @@
 
 package com.vbounyasit.bigdata
 
-import com.vbounyasit.bigdata.ETL.{ExecutionData, OptionalJobParameters}
+import com.vbounyasit.bigdata.ETL.{ExecutionData, JobFullExecutionParameters, OptionalJobParameters}
 import com.vbounyasit.bigdata.args.ArgumentsConfiguration
 import com.vbounyasit.bigdata.args.base.OutputArguments
 import com.vbounyasit.bigdata.config.ConfigurationsLoader
@@ -41,7 +41,7 @@ trait ETL[U, V] {
     * @param args The list of arguments to parse
     * @return An ExecutionData object containing all the required parameters
     */
-  def loadExecutionData(args: Array[String]): ExecutionData[_, _, _, _]
+  protected def loadExecutionData(args: Array[String]): ExecutionData
 
   /**
     * Extracts data from a provided sources configuration
@@ -94,11 +94,12 @@ trait ETL[U, V] {
     *
     * @param executionData The ExecutionData object that will be used
     */
-  def runETL[Config, Argument, ConfigInput, ArgumentInput](executionData: ExecutionData[Config, Argument, ConfigInput, ArgumentInput]): Unit = {
+  def runETL[Config, Argument, ConfigInput, ArgumentInput](executionData: ExecutionData): Unit = {
     implicit val spark: SparkSession = executionData.spark
 
     executionData.jobFullExecutionParameters
-      .foreach(jobParameters => {
+      .foreach(jobParametersExistential => {
+        val jobParameters = jobParametersExistential.asInstanceOf[JobFullExecutionParameters[Config, Argument, ConfigInput, ArgumentInput]]
         //extract
         val sources: Sources = extract(
           jobParameters.outputTable.table,
@@ -140,10 +141,10 @@ object ETL {
 
   type EmptyOptionalParameters = OptionalJobParameters[Nothing, Nothing]
 
-  case class ExecutionData[Config, Argument, ConfigInput, ArgumentInput](configurations: ConfigurationsLoader,
-                                                                         jobFullExecutionParameters: Seq[JobFullExecutionParameters[Config, Argument, ConfigInput, ArgumentInput]],
-                                                                         spark: SparkSession,
-                                                                         environment: String)
+  case class ExecutionData(configurations: ConfigurationsLoader,
+                           jobFullExecutionParameters: Seq[JobFullExecutionParameters[_, _, _, _]],
+                           spark: SparkSession,
+                           environment: String)
 
   case class JobFullExecutionParameters[Config, Argument, ConfigInput, ArgumentInput](jobConf: JobConf,
                                                                                       outputTable: TableMetadata,

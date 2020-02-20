@@ -60,7 +60,7 @@ abstract class SparkApplication[U, V] extends SparkSessionProvider with ETL[U, V
     * @param args The list of arguments to parse
     * @return An ExecutionData object containing all the required parameters
     */
-  protected def loadExecutionData(args: Array[String]): ExecutionData[_, _, _, _] = {
+  protected def loadExecutionData(args: Array[String]): ExecutionData = {
 
     case class TableMetadataSeq(tables: Seq[TableMetadata])
 
