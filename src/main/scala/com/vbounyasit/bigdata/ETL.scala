@@ -95,37 +95,39 @@ trait ETL[U, V] {
     * @param executionData The ExecutionData object that will be used
     */
   def runETL[Config, Argument, ConfigInput, ArgumentInput](executionData: ExecutionData[Config, Argument, ConfigInput, ArgumentInput]): Unit = {
-
     implicit val spark: SparkSession = executionData.spark
 
-    //extract
-    val sources: Sources = extract(
-      executionData.baseArguments.table,
-      executionData.jobConf.sources,
-      executionData.configurations.sourcesConf,
-      executionData.baseArguments.env)
+    executionData.jobFullExecutionParameters
+      .foreach(jobParameters => {
+        //extract
+        val sources: Sources = extract(
+          jobParameters.outputTable.table,
+          jobParameters.jobConf.sources,
+          executionData.configurations.sourcesConf,
+          executionData.environment)
 
-    //transform
-    val resultDataFrame = transform(
-      executionData.baseArguments.table,
-      sources,
-      //relying on runtime for this cast
-      executionData.executionFunction(
-        OptionalJobParameters(
-          executionData.optionalJobParameters.applicationConfig.map(_.asInstanceOf[ConfigInput]),
-          executionData.optionalJobParameters.arguments.map(_.asInstanceOf[ArgumentInput])
+        //transform
+        val resultDataFrame = transform(
+          jobParameters.outputTable.table,
+          sources,
+          //relying on runtime for this cast
+          jobParameters.executionFunction(
+            OptionalJobParameters(
+              jobParameters.optionalJobParameters.applicationConfig.map(_.asInstanceOf[ConfigInput]),
+              jobParameters.optionalJobParameters.arguments.map(_.asInstanceOf[ArgumentInput])
+            )
+          ),
+          Some(jobParameters.jobConf.outputMetadata.outputColumns),
+          Some(jobParameters.jobConf.outputMetadata.dateColumn)
         )
-      ),
-      Some(executionData.jobConf.outputMetadata.outputColumns),
-      Some(executionData.jobConf.outputMetadata.dateColumn)
-    )
-    //load
-    load(
-      resultDataFrame,
-      executionData.baseArguments.database,
-      executionData.baseArguments.table,
-      executionData.optionalJobParameters.asInstanceOf[OptionalJobParameters[U, V]]
-    )
+        //load
+        load(
+          resultDataFrame,
+          jobParameters.outputTable.database,
+          jobParameters.outputTable.table,
+          jobParameters.optionalJobParameters.asInstanceOf[OptionalJobParameters[U, V]]
+        )
+      })
   }
 }
 
@@ -139,11 +141,14 @@ object ETL {
   type EmptyOptionalParameters = OptionalJobParameters[Nothing, Nothing]
 
   case class ExecutionData[Config, Argument, ConfigInput, ArgumentInput](configurations: ConfigurationsLoader,
-                                                                         baseArguments: OutputArguments,
-                                                                         optionalJobParameters: OptionalJobParameters[Config, Argument],
-                                                                         executionFunction: OptionalJobParameters[ConfigInput, ArgumentInput] => ExecutionPlan,
-                                                                         jobConf: JobConf,
-                                                                         spark: SparkSession)
+                                                                         jobFullExecutionParameters: Seq[JobFullExecutionParameters[Config, Argument, ConfigInput, ArgumentInput]],
+                                                                         spark: SparkSession,
+                                                                         environment: String)
+
+  case class JobFullExecutionParameters[Config, Argument, ConfigInput, ArgumentInput](jobConf: JobConf,
+                                                                                      outputTable: TableMetadata,
+                                                                                      optionalJobParameters: OptionalJobParameters[Config, Argument],
+                                                                                      executionFunction: OptionalJobParameters[ConfigInput, ArgumentInput] => ExecutionPlan)
 
   case class OptionalJobParameters[Config, Argument](applicationConfig: Option[Config],
                                                      arguments: Option[Argument])
@@ -151,6 +156,16 @@ object ETL {
   case class ExecutionParameters[Config, Argument](executionFunction: OptionalJobParameters[Config, Argument] => ExecutionPlan,
                                                    additionalArguments: Option[ArgumentsConfiguration[Argument]] = None)
 
+  case class TableMetadata(database: String, table: String)
+
+  object JobFullExecutionParameters {
+    def applyExistential[Config, Argument, ConfigInput, ArgumentInput](jobConf: JobConf,
+                                                                       outputTable: TableMetadata,
+                                                                       optionalJobParameters: OptionalJobParameters[Config, Argument],
+                                                                       executionFunction: OptionalJobParameters[ConfigInput, ArgumentInput] => ExecutionPlan): JobFullExecutionParameters[_, _, _, _] = {
+      this.apply(jobConf, outputTable, optionalJobParameters, executionFunction)
+    }
+  }
 
   object ExecutionParameters {
     def apply[Config, Argument](executionPlan: ExecutionPlan): ExecutionParameters[Config, Argument] =

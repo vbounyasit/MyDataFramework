@@ -19,6 +19,9 @@
 
 package com.vbounyasit.bigdata.utils
 
+import com.vbounyasit.bigdata.ExceptionWithMessage
+import com.vbounyasit.bigdata.exceptions.ExceptionHandler.MergingMapKeyNotFound
+
 import scala.reflect.{ClassTag, classTag}
 
 /**
@@ -31,6 +34,15 @@ object CollectionsUtils {
       case (parent, (children1, children2)) => parent match {
         case child1: T if classTag[T].runtimeClass.isInstance(child1) => (child1 :: children1, children2)
         case child2: U if classTag[U].runtimeClass.isInstance(child2) => (children1, child2 :: children2)
+      }
+    }
+  }
+
+  def mergeByKeyStrict[U, V](map1: Map[String, U], map2: Map[String, V], errorOnKeyMatching: ExceptionWithMessage[MergingMapKeyNotFound]): Map[String, (U, V)] = {
+    map1.map{
+      case (key1, value1) => map2.get(key1) match {
+        case Some(value2) => (key1, (value1, value2))
+        case None => throw errorOnKeyMatching(key1)
       }
     }
   }

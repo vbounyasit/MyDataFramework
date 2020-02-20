@@ -30,7 +30,7 @@ object appImplicits {
   /**
     * Automatically handle either exceptions
     */
-  implicit def handleEither[T](either: Either[ExceptionHandler, T]): T = either match {
+  def handleEither[T](either: Either[ExceptionHandler, T]): T = either match {
     case Right(result) => result
     case Left(error) => throw error
   }
@@ -59,6 +59,4 @@ object appImplicits {
       }
     }
   }
-
-
 }

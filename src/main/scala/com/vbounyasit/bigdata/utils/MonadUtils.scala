@@ -20,6 +20,8 @@
 package com.vbounyasit.bigdata.utils
 
 import com.vbounyasit.bigdata.exceptions.ExceptionHandler
+import cats.implicits._
+import com.vbounyasit.bigdata.ExceptionWithMessage
 
 /**
   * Utilities related to Monad operations
@@ -28,5 +30,13 @@ object MonadUtils {
 
   def optionToEither[T, V <: ExceptionHandler](option: Option[T], left: V): Either[V, T] = {
     Either.cond(option.isDefined, option.get, left)
+  }
+
+  def getMapSubList[K, V, Error <: ExceptionHandler](keySubSeq: List[K], dataMap: Map[K, V], errorNotFound: ExceptionWithMessage[Error])(implicit keyConverter: K => String): Either[Error, Map[K, V]] = {
+    def toEither[U](option: Option[(K, U)]): Either[Error, (K, U)] = Either.cond(option.isDefined, option.get, errorNotFound(keyConverter(option.get._1)))
+    keySubSeq
+      .map(key => dataMap.get(key).map(key -> _))
+      .map(toEither)
+      .sequence.map(_.toMap)
   }
 }

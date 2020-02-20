@@ -21,6 +21,7 @@ package com.vbounyasit.bigdata.config
 
 import com.typesafe.config.{Config, ConfigFactory}
 import com.vbounyasit.bigdata.ApplicationConf
+import com.vbounyasit.bigdata.ETL.TableMetadata
 
 /**
   * Everything related to configuration files loading is handled here.
@@ -60,7 +61,7 @@ trait ConfigDefinition {
   /**
     * The output tables and jobs to run
     */
-  val getResultingTables: Option[Seq[(String, String)]] = None
+  val resultingOutputTables: Option[Seq[TableMetadata]] = None
 
 
 }

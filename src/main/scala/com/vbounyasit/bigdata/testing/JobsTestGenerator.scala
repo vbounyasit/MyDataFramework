@@ -81,7 +81,7 @@ trait JobsTestGenerator extends TestComponents {
     val executionPlans = sparkApplication.executionPlans
     val optionalParameters: OptionalJobParameters[Any, Any] = OptionalJobParameters(defaultApplicationConf, defaultCustomArgument)
 
-    executionPlans.foreach {
+    /*executionPlans.foreach {
       case (jobName, ExecutionParameters(executionFunction, _)) =>
         s"${jobName.capitalize}" should "Compute the right Result" in {
           val jobConf: JobConf = ConfigsExtractor.getJob(jobName, loadedConfigurations.jobsConf)
@@ -226,7 +226,7 @@ trait JobsTestGenerator extends TestComponents {
               fail("No output file could be read for this Job. Creating a file from the result obtained in this test.")
           }
         }
-    }
+    }*/
   }
 
   /**

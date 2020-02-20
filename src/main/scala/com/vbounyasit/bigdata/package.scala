@@ -32,8 +32,10 @@ package object bigdata {
   type EitherRP = Either[ExceptionHandler, SourcePipeline]
   type ApplicationConf[T] = Option[ApplicationConfData[T]]
   type PureConfigLoaded[T] = Either[ConfigReaderFailures, T]
+  type ExceptionWithMessage[T <: ExceptionHandler] = String => T
 
   case class DatePattern(pattern: String)
 
-  val datePattern = DatePattern("yyyy-MM-dd")
+  val datePattern: DatePattern = DatePattern("yyyy-MM-dd")
+
 }

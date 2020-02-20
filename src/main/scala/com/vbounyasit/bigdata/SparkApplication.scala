@@ -20,20 +20,19 @@
 package com.vbounyasit.bigdata
 
 import cats.implicits._
-import com.vbounyasit.bigdata.ETL.{ExecutionConfig, ExecutionData, OptionalJobParameters}
+import com.vbounyasit.bigdata.ETL._
 import com.vbounyasit.bigdata.appImplicits._
-import com.vbounyasit.bigdata.args.base.OutputArgumentsConf
+import com.vbounyasit.bigdata.args.base.{OutputArguments, OutputArgumentsConf}
 import com.vbounyasit.bigdata.config.ConfigurationsLoader.loadConfig
-import com.vbounyasit.bigdata.config.data.JobsConfig.JobSource
+import com.vbounyasit.bigdata.config.data.JobsConfig.{JobConf, JobSource}
 import com.vbounyasit.bigdata.config.data.SourcesConfig.SourcesConf
 import com.vbounyasit.bigdata.config.{ConfigDefinition, ConfigsExtractor, ConfigurationsLoader}
-import com.vbounyasit.bigdata.exceptions.ExceptionHandler.{ExecutionPlanNotFoundError, JobSourcesNotFoundError}
+import com.vbounyasit.bigdata.exceptions.ExceptionHandler._
 import com.vbounyasit.bigdata.providers.{LoggerProvider, SparkSessionProvider}
 import com.vbounyasit.bigdata.transform.ExecutionPlan
-import com.vbounyasit.bigdata.utils.{DateUtils, MonadUtils}
-import org.apache.spark.sql.functions.lit
+import com.vbounyasit.bigdata.utils.{CollectionsUtils, DateUtils, MonadUtils}
+import org.apache.spark.sql.functions.{lit, _}
 import org.apache.spark.sql.{DataFrame, SparkSession}
-import org.apache.spark.sql.functions._
 
 /**
   * A class representing a submitted Spark application.
@@ -61,8 +60,15 @@ abstract class SparkApplication[U, V] extends SparkSessionProvider with ETL[U, V
     * @param args The list of arguments to parse
     * @return An ExecutionData object containing all the required parameters
     */
-  def loadExecutionData(args: Array[String]): ExecutionData[_, _, _, _] = {
-    for {
+  protected def loadExecutionData(args: Array[String]): ExecutionData[_, _, _, _] = {
+
+    case class TableMetadataSeq(tables: Seq[TableMetadata])
+
+    case class JobsConfMap(configs: Map[String, JobConf])
+
+    case class ExecutionParametersMap(parameters: Map[String, ExecutionConfig])
+
+    handleEither(for {
       /**
         * Loading configuration files
         */
@@ -80,49 +86,88 @@ abstract class SparkApplication[U, V] extends SparkSessionProvider with ETL[U, V
       }
 
       /**
-        * Loading job conf
+        * Getting the list of jobs to compute
         */
-      jobConf <- ConfigsExtractor.getJob(parsedBaseArgument.table, loadedConfigurations.jobsConf)
+      tablesToCompute <- {
+        val output: Option[TableMetadataSeq] = configDefinition.resultingOutputTables match {
+          case None => (parsedBaseArgument.table, parsedBaseArgument.database) match {
+            case ("N/A", _) | (_, "N/A") => None
+            case (database, table) => Some(TableMetadataSeq(Seq(TableMetadata(database, table))))
+          }
+          case resultingTables => resultingTables.map(TableMetadataSeq)
+        }
+        MonadUtils.optionToEither(output, NoOutputTablesSpecified())
+      }
+
+      /**
+        * Loading jobs conf
+        */
+      jobsConf <- {
+        ConfigsExtractor
+          .getJobs(tablesToCompute.tables.map(_.table), loadedConfigurations.jobsConf)
+          .map(JobsConfMap)
+      }
 
       /**
         * Loading execution parameters
         */
-      executionParameters <- {
+      executionsParameters <- {
         implicit val spark: SparkSession = getSparkSession(loadedConfigurations.sparkParamsConf)
-        val jobName = parsedBaseArgument.table
-        MonadUtils.optionToEither(executionPlans.get(jobName), ExecutionPlanNotFoundError(jobName))
+        MonadUtils
+          .getMapSubList(tablesToCompute.tables.map(_.table).toList, executionPlans, ExecutionPlanNotFoundError)
+          .map(ExecutionParametersMap)
       }
     } yield {
-      /**
-        * Optional custom arguments
-        */
       val spark: SparkSession = getSparkSession(loadedConfigurations.sparkParamsConf)
-      val parsedCustomArguments: Option[_] = executionParameters.additionalArguments.map(argsConf => {
-        val argumentParser = argsConf.argumentParser
-        handleEither(argumentParser.parseArguments(
-          loadedConfigurations.sparkParamsConf.appName,
-          args
-        ))
-      }
-      )
-
       /**
         * Optional Application config
+        * TODO : Currently, a single config file defined in ConfigDefinition will be used for every job's configuration. Might want to define one file per job.
         */
       val customConfiguration: Option[_] = configDefinition.applicationConf.map(conf =>
-        handleEither(loadConfig(conf.configFileName, conf.pureconfigLoaded))
+        handleEither(loadConfig(conf.configFileName, conf.pureConfigLoaded))
       )
 
+      /**
+        * Merging with the list of output tables
+        */
+      val jobsConfWithOutputMetadata: Map[String, (JobConf, TableMetadata)] = CollectionsUtils.mergeByKeyStrict(
+        jobsConf.configs,
+        tablesToCompute.tables.map(metadata => (metadata.table, metadata)).toMap,
+        MergingMapKeyNotFound
+      )
+
+      /**
+        * Building the final Job parameters object
+        */
+      val jobFullExecutionParameters = CollectionsUtils
+        .mergeByKeyStrict(
+          jobsConfWithOutputMetadata,
+          executionsParameters.parameters,
+          MergingMapKeyNotFound
+        ).values
+        /**
+          * Adding Optional custom arguments
+          */
+        .map {
+          case ((jobConf, tableMetadata), executionConfig) =>
+            val parsedCustomArguments: Option[_] = executionConfig.additionalArguments.map(argsConf => {
+              val argumentParser = argsConf.argumentParser
+              handleEither(argumentParser.parseArguments(
+                loadedConfigurations.sparkParamsConf.appName,
+                args
+              ))
+            })
+            JobFullExecutionParameters(jobConf, tableMetadata, OptionalJobParameters(customConfiguration, parsedCustomArguments), executionConfig.executionFunction)
+        }.toSeq
       logger.info("Successfully loaded parameters from configuration files")
+
       ExecutionData(
         loadedConfigurations,
-        parsedBaseArgument,
-        OptionalJobParameters(customConfiguration, parsedCustomArguments),
-        executionParameters.executionFunction,
-        jobConf,
-        spark
+        jobFullExecutionParameters,
+        spark,
+        parsedBaseArgument.env
       )
-    }
+    })
   }
 
   /**
@@ -176,6 +221,7 @@ abstract class SparkApplication[U, V] extends SparkSessionProvider with ETL[U, V
         case None => dataFrame
       }
     }
+
     selectOutputColumns(
       attachExportDate(
         executionPlan
@@ -189,6 +235,6 @@ abstract class SparkApplication[U, V] extends SparkSessionProvider with ETL[U, V
 
 object SparkApplication {
 
-  case class ApplicationConfData[T](configFileName: String, pureconfigLoaded: PureConfigLoaded[T])
+  case class ApplicationConfData[T](configFileName: String, pureConfigLoaded: PureConfigLoaded[T])
 
 }

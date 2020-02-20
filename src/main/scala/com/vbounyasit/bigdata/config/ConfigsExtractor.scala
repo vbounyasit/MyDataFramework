@@ -28,6 +28,7 @@ import com.vbounyasit.bigdata.exceptions.ExceptionHandler.{JobNotFoundError, Job
 import com.vbounyasit.bigdata.implicits._
 import com.vbounyasit.bigdata.transform.TransformOps._
 import com.vbounyasit.bigdata.transform.pipeline.impl.SourcePipeline
+import com.vbounyasit.bigdata.utils.MonadUtils
 import org.apache.spark.sql.functions.col
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
@@ -52,7 +53,7 @@ object ConfigsExtractor {
         case (database, table) =>
           val sourcePipeline = spark.read.table(s"$database.$table")
           val selector: DataFrame => DataFrame = _.select(jobSource.selectedColumns.map(col): _*)
-          val dropDuplicate: DataFrame => DataFrame = _.dropDuplicates()
+          val dropDuplicate: DataFrame => DataFrame = dataFrame => if(jobSource.dropDuplicates) dataFrame.dropDuplicates() else dataFrame
           (jobSource.sourceName, sourcePipeline ==> selector ==> dropDuplicate)
       }
     })
@@ -71,11 +72,21 @@ object ConfigsExtractor {
     *
     * @param jobName  the Job name
     * @param jobsConf the Job configuration list
-    * @return Either the wanted Job configuration or a Job not found error exception
+    * @return Either the wanted Job configuration or a JobNotFoundError exception
     */
   def getJob(jobName: String, jobsConf: JobsConf): Either[JobNotFoundError, JobConf] = {
     val jobConf = jobsConf.jobs.get(jobName)
     Either.cond(jobConf.isDefined, jobConf.get, JobNotFoundError(jobName))
+  }
+
+  /**
+    * Gets a sublist of JobConf object with a provided list of jobNames to get from the job confs provided
+    * @param jobsName The sequence of job names to query
+    * @param jobsConf The job configuration list to query from
+    * @return Either a jobName -> jobConf Map containing the elements we need or a JobNotFoundError exception
+    */
+  def getJobs(jobsName: Seq[String], jobsConf: JobsConf): Either[JobNotFoundError, Map[String, JobConf]] = {
+    MonadUtils.getMapSubList(jobsName.toList, jobsConf.jobs, JobNotFoundError)
   }
 
   /**

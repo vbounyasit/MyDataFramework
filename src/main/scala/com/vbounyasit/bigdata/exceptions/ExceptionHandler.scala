@@ -90,6 +90,16 @@ object ExceptionHandler {
     override protected val constructedMessage: String = configErrors.toList.map(_.description).mkString("\n")
   }
 
+  case class NoOutputTablesSpecified() extends ExceptionHandler {
+    override protected val exceptionType: String = "No output tables specified"
+    override protected val constructedMessage: String = "Please specify output tables either in argument command line or the ConfigDefinition class"
+  }
+
+  case class MergingMapKeyNotFound(key: String) extends ExceptionHandler {
+    override protected val exceptionType: String = s"[$key] not found"
+    override protected val constructedMessage: String = s"Cannot find [$key] in map for map merging procedure"
+  }
+
   /**
     * Test exceptions
     */
