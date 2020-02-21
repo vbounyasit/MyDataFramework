@@ -91,8 +91,8 @@ object ExceptionHandler {
   }
 
   case class NoOutputTablesSpecified() extends ExceptionHandler {
-    override protected val exceptionType: String = "No output tables specified"
-    override protected val constructedMessage: String = "Please specify output tables either in argument command line or the ConfigDefinition class"
+    override protected val exceptionType: String = "No output tables found"
+    override protected val constructedMessage: String = "Please specify output tables in argument command line or the ConfigDefinition class"
   }
 
   case class MergingMapKeyNotFound(key: String) extends ExceptionHandler {

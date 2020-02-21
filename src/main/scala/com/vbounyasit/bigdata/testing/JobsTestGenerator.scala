@@ -53,15 +53,21 @@ trait JobsTestGenerator extends TestComponents {
     */
   val dataFrameWriter: DataFrameWriter
 
-  /**
-    * An optional custom argument object we want to use in our tests.
-    */
-  val defaultCustomArgument: Option[_] = None
 
   /**
     * An optional application conf file we want to use in our tests.
     */
   val defaultApplicationConf: Option[_] = None
+
+  /**
+    * An optional application argument object we want to use in our tests.
+    */
+  val defaultApplicationArguments: Option[_] = None
+
+  /**
+    * An optional job argument object we want to use in our tests.
+    */
+  val defaultJobArguments: Option[_] = None
 
   /**
     * Executing the tests.
@@ -77,7 +83,9 @@ trait JobsTestGenerator extends TestComponents {
       logger.info("Hive environment successfully setup")
     }
 
-    val optionalParameters: OptionalJobParameters[Any, Any] = OptionalJobParameters(defaultApplicationConf, defaultCustomArgument)
+    //todo change application conf to job conf
+    val optionalApplicationParameters: OptionalJobParameters[Any, Any] = OptionalJobParameters(defaultApplicationConf, defaultApplicationArguments)
+    val optionalJobParameters: OptionalJobParameters[Any, Any] = OptionalJobParameters(defaultApplicationConf, defaultJobArguments)
 
     sparkApplication.executionPlans.foreach {
       case (jobName, ExecutionParameters(executionFunction, _)) => {
@@ -148,7 +156,7 @@ trait JobsTestGenerator extends TestComponents {
           val resultDataFrame = sparkApplication.transform(
             jobName,
             sources,
-            executionFunction(optionalParameters),
+            executionFunction(optionalApplicationParameters, optionalJobParameters),
             Some(jobConf.outputMetadata.outputColumns),
             None
           )
