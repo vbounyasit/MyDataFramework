@@ -141,7 +141,6 @@ abstract class SparkApplication[U, V] extends SparkSessionProvider with ETL[U, V
     } yield {
       val spark: SparkSession = getSparkSession(loadedConfigurations.sparkParamsConf)
 
-
       /**
         * Merging with the list of output tables
         */
