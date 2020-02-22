@@ -19,6 +19,7 @@
 
 package com.vbounyasit
 
+import com.vbounyasit.bigdata.ETL.TableMetadata
 import com.vbounyasit.bigdata.SparkApplication.ApplicationConfData
 import com.vbounyasit.bigdata.exceptions.ExceptionHandler
 import com.vbounyasit.bigdata.transform.ExecutionPlan
@@ -33,6 +34,7 @@ package object bigdata {
   type ApplicationConf[T] = Option[ApplicationConfData[T]]
   type PureConfigLoaded[T] = Either[ConfigReaderFailures, T]
   type ExceptionWithMessage[T <: ExceptionHandler] = String => T
+  type OutputTables = Option[Seq[TableMetadata]]
 
   case class DatePattern(pattern: String)
 

@@ -20,16 +20,19 @@
 package com.vbounyasit.bigdata.config
 
 import com.typesafe.config.{Config, ConfigFactory}
-import com.vbounyasit.bigdata.ApplicationConf
 import com.vbounyasit.bigdata.ETL.TableMetadata
 import com.vbounyasit.bigdata.args.ArgumentsConfiguration
+import com.vbounyasit.bigdata.config.OutputTablesInfo.ResultTables
+import com.vbounyasit.bigdata.{ApplicationConf, OutputTables}
 
 /**
   * Everything related to configuration files loading is handled here.
   */
 trait ConfigDefinition {
 
-  implicit def toOptionalOutputTables(tables: Seq[(String, String)]): Option[Seq[(String, String)]] = Some(tables)
+  implicit def function1ToOutputTablesInfo(function1: _ => OutputTables): ResultTables = OutputTablesInfo(function1)
+
+  implicit def function2ToOutputTablesInfo(function2: (_, _) => OutputTables): ResultTables = OutputTablesInfo(function2)
 
   /**
     * The spark parameters that will be used on the remote cluster we submit our job on.
@@ -67,8 +70,7 @@ trait ConfigDefinition {
   /**
     * The output tables and jobs to run
     */
-  def resultingOutputTables[GlobalConfig, GlobalArgument](applicationConf: Option[GlobalConfig],
-                                                          applicationArgument: GlobalArgument): Option[Seq[TableMetadata]] = None
+  val outputTables: ResultTables
 
 
 }

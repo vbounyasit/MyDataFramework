@@ -19,7 +19,7 @@
 
 package com.vbounyasit.bigdata
 
-import com.vbounyasit.bigdata.ETL.{ExecutionData, JobFullExecutionParameters, OptionalJobParameters}
+import com.vbounyasit.bigdata.ETL.{ExecutionData, JobFullExecutionParameters, OptionalJobParameters, TableMetadata}
 import com.vbounyasit.bigdata.args.ArgumentsConfiguration
 import com.vbounyasit.bigdata.config.ConfigurationsLoader
 import com.vbounyasit.bigdata.config.data.JobsConfig.{JobConf, JobSource}
@@ -77,14 +77,12 @@ trait ETL[U, V] {
     * Saves the resulting dataFrame to disk
     *
     * @param dataFrame             The resulting DataFrame
-    * @param database              The output database name
-    * @param table                 The output table name (job name)
+    * @param outputTables              The output database and table
     * @param optionalJobParameters An OptionalJobParameters object containing any custom
     *                              argument/application files we defined through our application.
     */
   def load(dataFrame: DataFrame,
-           database: String,
-           table: String,
+           outputTables: TableMetadata,
            optionalJobParameters: OptionalJobParameters[U, V]): Unit
 
 
@@ -130,8 +128,7 @@ trait ETL[U, V] {
         //load
         load(
           resultDataFrame,
-          jobParameters.outputTable.database,
-          jobParameters.outputTable.table,
+          jobParameters.outputTable,
           jobParameters.optionalJobParameters.asInstanceOf[OptionalJobParameters[U, V]]
         )
       })
