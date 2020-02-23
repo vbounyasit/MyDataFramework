@@ -36,6 +36,8 @@ import com.vbounyasit.bigdata.utils.{CollectionsUtils, DateUtils, MonadUtils}
 import org.apache.spark.sql.functions.{lit, _}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
+import scala.util.Try
+
 /**
   * A class representing a submitted Spark application.
   */
@@ -69,7 +71,7 @@ abstract class SparkApplication[U, V] extends SparkSessionProvider with ETL[U, V
       * TODO : Currently, a single config file defined in ConfigDefinition will be used for every job's configuration. Might want to define one file per job.
       */
     val parsedApplicationConfiguration: Option[_] = configDefinition.applicationConf.map(conf =>
-      handleEither(loadConfig(conf.configFileName, conf.pureConfigLoaded))
+      handleEither(conf)
     )
 
     /**
@@ -115,6 +117,7 @@ abstract class SparkApplication[U, V] extends SparkSessionProvider with ETL[U, V
           case tableInfo @ OutputTablesInfo(Some(_), None) => parsedApplicationInfo match {
             case (Some(appConf), None) => tableInfo.applyFunction1(appConf)
             case (None, Some(arguments)) => tableInfo.applyFunction1(arguments)
+            case (Some(appConf), Some(arguments)) => Try(tableInfo.applyFunction1(appConf)).getOrElse(tableInfo.applyFunction1(arguments))
             case _ => None
           }
           case tableInfo @ OutputTablesInfo(None, Some(_)) => parsedApplicationInfo match {
@@ -263,10 +266,4 @@ abstract class SparkApplication[U, V] extends SparkSessionProvider with ETL[U, V
       )
     )
   }
-}
-
-object SparkApplication {
-
-  case class ApplicationConfData[T](configFileName: String, pureConfigLoaded: PureConfigLoaded[T])
-
 }
