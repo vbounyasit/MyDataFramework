@@ -20,22 +20,23 @@
 package com.vbounyasit.bigdata.config
 
 import com.typesafe.config.{Config, ConfigFactory}
-import com.vbounyasit.bigdata.ApplicationConf
+import com.vbounyasit.bigdata.args.ArgumentsConfiguration
+import com.vbounyasit.bigdata.config.OutputTablesInfo.ResultTables
+import com.vbounyasit.bigdata.{ApplicationConf, OutputTables}
+import pureconfig.ConfigReader
 
 /**
   * Everything related to configuration files loading is handled here.
   */
 trait ConfigDefinition {
 
-  implicit def toOptionalOutputTables(tables: Seq[(String, String)]): Option[Seq[(String, String)]] = Some(tables)
+  implicit def function1ToOutputTablesInfo(function1: _ => OutputTables): ResultTables = OutputTablesInfo(function1)
 
-  /**
-    * An optional configuration file related to our application.
-    *
-    * Note: On the Application side, you can fill this parameter using the
-    * loadConfig function from pureconfig
-    */
-  val applicationConf: ApplicationConf[_] = None
+  implicit def function2ToOutputTablesInfo(function2: (_, _) => OutputTables): ResultTables = OutputTablesInfo(function2)
+
+  def loadConfig[T](configName: String, config: Config)(implicit reader: ConfigReader[T]): ApplicationConf[T] = {
+    Some(ConfigurationsLoader.loadConfig[T](configName, config))
+  }
 
   /**
     * The spark parameters that will be used on the remote cluster we submit our job on.
@@ -58,9 +59,22 @@ trait ConfigDefinition {
   val jobsConf: Config
 
   /**
+    * An optional configuration file related to our application.
+    *
+    * Note: On the Application side, you can fill this parameter using the
+    * loadConfig function from pureconfig
+    */
+  val applicationConf: ApplicationConf[_] = None
+
+  /**
+    * The arguments parameters that will be parsed for every jobs launched
+    */
+  val applicationArguments: Option[ArgumentsConfiguration[_]] = None
+
+  /**
     * The output tables and jobs to run
     */
-  val getResultingTables: Option[Seq[(String, String)]] = None
+  val outputTables: ResultTables
 
 
 }

@@ -21,7 +21,6 @@ package com.vbounyasit.bigdata.testing.common
 
 import cats.data.Validated
 import cats.implicits._
-import com.vbounyasit.bigdata.appImplicits._
 import com.vbounyasit.bigdata.config.ConfigsExtractor
 import com.vbounyasit.bigdata.config.data.JobsConfig.JobsConf
 import com.vbounyasit.bigdata.config.data.SourcesConfig.SourcesConf
@@ -29,8 +28,8 @@ import com.vbounyasit.bigdata.exceptions.ExceptionHandler.{JobSourcesNotFoundErr
 import com.vbounyasit.bigdata.implicits._
 import com.vbounyasit.bigdata.providers.LoggerProvider
 import com.vbounyasit.bigdata.testing.data.JobTableMetadata
-import com.vbounyasit.bigdata.testing.environment
 import com.vbounyasit.bigdata.testing.formats.DataFrameIO.DataFrameLoader
+import com.vbounyasit.bigdata.testing.{environment, handleEither}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
 import scala.util.{Failure, Success, Try}
@@ -72,7 +71,7 @@ class HiveEnvironment(val dataFrameLoader: DataFrameLoader) extends LoggerProvid
     val dataFramesInfo = dataFrameLoader.loadDataFrames(validatedJobSourcesInfo.toEither, "in")
     val validatedDataFramesInfo: Either[ReadDataFramesFromFilesError, List[(JobTableMetadata, DataFrame)]] = dataFramesInfo.sequence
 
-    validatedDataFramesInfo.foreach {
+    handleEither(validatedDataFramesInfo).foreach {
       case (jobSourceInfo, dataFrame) =>
         val info = Seq(s"${jobSourceInfo.database}", s"${jobSourceInfo.jobName}", s"${jobSourceInfo.table}")
         //adding in a job identifier, since we don't want conflict in jobs sharing common source tables

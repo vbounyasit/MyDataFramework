@@ -19,7 +19,7 @@
 
 package com.vbounyasit
 
-import com.vbounyasit.bigdata.SparkApplication.ApplicationConfData
+import com.vbounyasit.bigdata.ETL.TableMetadata
 import com.vbounyasit.bigdata.exceptions.ExceptionHandler
 import com.vbounyasit.bigdata.transform.ExecutionPlan
 import com.vbounyasit.bigdata.transform.pipeline.impl.SourcePipeline
@@ -30,10 +30,13 @@ package object bigdata {
   type Sources = Map[String, SourcePipeline]
   type ExecutionPlans = Map[String, ExecutionPlan]
   type EitherRP = Either[ExceptionHandler, SourcePipeline]
-  type ApplicationConf[T] = Option[ApplicationConfData[T]]
+  type ApplicationConf[T] = Option[Either[ExceptionHandler, T]]
   type PureConfigLoaded[T] = Either[ConfigReaderFailures, T]
+  type ExceptionWithMessage[T <: ExceptionHandler] = String => T
+  type OutputTables = Option[Seq[TableMetadata]]
 
   case class DatePattern(pattern: String)
 
-  val datePattern = DatePattern("yyyy-MM-dd")
+  val datePattern: DatePattern = DatePattern("yyyy-MM-dd")
+
 }

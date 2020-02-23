@@ -19,12 +19,12 @@
 
 package com.vbounyasit.bigdata
 
-import com.vbounyasit.bigdata.ETL.{ExecutionData, OptionalJobParameters}
+import com.vbounyasit.bigdata.ETL.{ExecutionData, JobFullExecutionParameters, OptionalJobParameters, TableMetadata}
 import com.vbounyasit.bigdata.args.ArgumentsConfiguration
-import com.vbounyasit.bigdata.args.base.OutputArguments
 import com.vbounyasit.bigdata.config.ConfigurationsLoader
 import com.vbounyasit.bigdata.config.data.JobsConfig.{JobConf, JobSource}
 import com.vbounyasit.bigdata.config.data.SourcesConfig.SourcesConf
+import com.vbounyasit.bigdata.exceptions.ExceptionHandler
 import com.vbounyasit.bigdata.transform.ExecutionPlan
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
@@ -41,7 +41,7 @@ trait ETL[U, V] {
     * @param args The list of arguments to parse
     * @return An ExecutionData object containing all the required parameters
     */
-  def loadExecutionData(args: Array[String]): ExecutionData[_, _, _, _]
+  protected def loadExecutionData(args: Array[String]): ExecutionData[_, _]
 
   /**
     * Extracts data from a provided sources configuration
@@ -78,14 +78,12 @@ trait ETL[U, V] {
     * Saves the resulting dataFrame to disk
     *
     * @param dataFrame             The resulting DataFrame
-    * @param database              The output database name
-    * @param table                 The output table name (job name)
+    * @param outputTables          The output database and table
     * @param optionalJobParameters An OptionalJobParameters object containing any custom
     *                              argument/application files we defined through our application.
     */
   def load(dataFrame: DataFrame,
-           database: String,
-           table: String,
+           outputTables: TableMetadata,
            optionalJobParameters: OptionalJobParameters[U, V]): Unit
 
 
@@ -94,38 +92,47 @@ trait ETL[U, V] {
     *
     * @param executionData The ExecutionData object that will be used
     */
-  def runETL[Config, Argument, ConfigInput, ArgumentInput](executionData: ExecutionData[Config, Argument, ConfigInput, ArgumentInput]): Unit = {
-
+  def runETL[GlobalConfig, GlobalArgument, Config, Argument, ConfigInput, ArgumentInput](executionData: ExecutionData[GlobalConfig, GlobalArgument]): Unit = {
     implicit val spark: SparkSession = executionData.spark
 
-    //extract
-    val sources: Sources = extract(
-      executionData.baseArguments.table,
-      executionData.jobConf.sources,
-      executionData.configurations.sourcesConf,
-      executionData.baseArguments.env)
+    val globalApplicationConf: Option[GlobalConfig] = executionData.applicationConf
+    val globalArguments: Option[GlobalArgument] = executionData.applicationArguments
 
-    //transform
-    val resultDataFrame = transform(
-      executionData.baseArguments.table,
-      sources,
-      //relying on runtime for this cast
-      executionData.executionFunction(
-        OptionalJobParameters(
-          executionData.optionalJobParameters.applicationConfig.map(_.asInstanceOf[ConfigInput]),
-          executionData.optionalJobParameters.arguments.map(_.asInstanceOf[ArgumentInput])
+    executionData.jobFullExecutionParameters
+      .foreach(jobParametersExistential => {
+        val jobParameters = jobParametersExistential.asInstanceOf[JobFullExecutionParameters[GlobalConfig, GlobalArgument, Config, Argument, ConfigInput, ArgumentInput]]
+        //extract
+        val sources: Sources = extract(
+          jobParameters.outputTable.table,
+          jobParameters.jobConf.sources,
+          executionData.configurations.sourcesConf,
+          executionData.environment)
+
+        //transform
+        val resultDataFrame = transform(
+          jobParameters.outputTable.table,
+          sources,
+          //relying on runtime for this cast
+          jobParameters.executionFunction(
+            OptionalJobParameters(
+              globalApplicationConf,
+              globalArguments
+            ),
+            OptionalJobParameters(
+              jobParameters.optionalJobParameters.applicationConfig.map(_.asInstanceOf[ConfigInput]),
+              jobParameters.optionalJobParameters.arguments.map(_.asInstanceOf[ArgumentInput])
+            )
+          ),
+          Some(jobParameters.jobConf.outputMetadata.outputColumns),
+          Some(jobParameters.jobConf.outputMetadata.dateColumn)
         )
-      ),
-      Some(executionData.jobConf.outputMetadata.outputColumns),
-      Some(executionData.jobConf.outputMetadata.dateColumn)
-    )
-    //load
-    load(
-      resultDataFrame,
-      executionData.baseArguments.database,
-      executionData.baseArguments.table,
-      executionData.optionalJobParameters.asInstanceOf[OptionalJobParameters[U, V]]
-    )
+        //load
+        load(
+          resultDataFrame,
+          jobParameters.outputTable,
+          jobParameters.optionalJobParameters.asInstanceOf[OptionalJobParameters[U, V]]
+        )
+      })
   }
 }
 
@@ -134,26 +141,35 @@ trait ETL[U, V] {
   */
 object ETL {
 
-  type ExecutionConfig = ExecutionParameters[_, _]
+  type ExecutionConfig = ExecutionParameters[_, _, _, _]
 
   type EmptyOptionalParameters = OptionalJobParameters[Nothing, Nothing]
 
-  case class ExecutionData[Config, Argument, ConfigInput, ArgumentInput](configurations: ConfigurationsLoader,
-                                                                         baseArguments: OutputArguments,
-                                                                         optionalJobParameters: OptionalJobParameters[Config, Argument],
-                                                                         executionFunction: OptionalJobParameters[ConfigInput, ArgumentInput] => ExecutionPlan,
-                                                                         jobConf: JobConf,
-                                                                         spark: SparkSession)
+  type OptionalParameters[GlobalConfig, GlobalArgument, Config, Argument] = (OptionalJobParameters[GlobalConfig, GlobalArgument], OptionalJobParameters[Config, Argument])
+
+  case class ExecutionData[GlobalConfig, GlobalArgument](configurations: ConfigurationsLoader,
+                                                         applicationConf: Option[GlobalConfig],
+                                                         applicationArguments: Option[GlobalArgument],
+                                                         jobFullExecutionParameters: Seq[JobFullExecutionParameters[_, _, _, _, _, _]],
+                                                         spark: SparkSession,
+                                                         environment: String)
+
+  case class JobFullExecutionParameters[GlobalConfigInput, GlobalArgumentInput, Config, Argument, ConfigInput, ArgumentInput](jobConf: JobConf,
+                                                                                                                              outputTable: TableMetadata,
+                                                                                                                              optionalJobParameters: OptionalJobParameters[Config, Argument],
+                                                                                                                              executionFunction: OptionalParameters[GlobalConfigInput, GlobalArgumentInput, ConfigInput, ArgumentInput] => ExecutionPlan)
 
   case class OptionalJobParameters[Config, Argument](applicationConfig: Option[Config],
                                                      arguments: Option[Argument])
 
-  case class ExecutionParameters[Config, Argument](executionFunction: OptionalJobParameters[Config, Argument] => ExecutionPlan,
-                                                   additionalArguments: Option[ArgumentsConfiguration[Argument]] = None)
+  case class ExecutionParameters[GlobalConfig, GlobalArgument, Config, Argument](executionFunction: OptionalParameters[GlobalConfig, GlobalArgument, Config, Argument] => ExecutionPlan,
+                                                                                 additionalConfig: Option[Either[ExceptionHandler, Config]] = None,
+                                                                                 additionalArguments: Option[ArgumentsConfiguration[Argument]] = None)
 
+  case class TableMetadata(database: String, table: String)
 
   object ExecutionParameters {
-    def apply[Config, Argument](executionPlan: ExecutionPlan): ExecutionParameters[Config, Argument] =
+    def apply[GlobalConfig, GlobalArgument, Config, Argument](executionPlan: ExecutionPlan): ExecutionParameters[GlobalConfig, GlobalArgument, Config, Argument] =
       ExecutionParameters(_ => executionPlan)
   }
 

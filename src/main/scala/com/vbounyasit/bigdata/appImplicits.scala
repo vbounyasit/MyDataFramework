@@ -27,13 +27,7 @@ import com.vbounyasit.bigdata.providers.LoggerProvider
   */
 object appImplicits {
 
-  /**
-    * Automatically handle either exceptions
-    */
-  implicit def handleEither[T](either: Either[ExceptionHandler, T]): T = either match {
-    case Right(result) => result
-    case Left(error) => throw error
-  }
+
 
   /**
     * Allow us to handle Either objects while logging in between the operations
@@ -59,6 +53,4 @@ object appImplicits {
       }
     }
   }
-
-
 }

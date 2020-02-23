@@ -1,6 +1,6 @@
 name := "DataFlow"
 
-version := "1.0.1-SNAPSHOT"
+version := "1.0.2"
 
 scalaVersion := "2.11.12"
 

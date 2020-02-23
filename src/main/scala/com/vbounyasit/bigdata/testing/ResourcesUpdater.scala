@@ -24,7 +24,6 @@ import java.io.File
 import cats.data.Validated
 import cats.implicits._
 import com.vbounyasit.bigdata.SparkApplication
-import com.vbounyasit.bigdata.appImplicits._
 import com.vbounyasit.bigdata.config.data.JobsConfig.JobSource
 import com.vbounyasit.bigdata.config.{ConfigsExtractor, ConfigurationsLoader}
 import com.vbounyasit.bigdata.exceptions.ExceptionHandler.{JobSourcesNotFoundError, ReadDataFramesFromFilesError}
