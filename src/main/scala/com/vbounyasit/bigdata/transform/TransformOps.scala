@@ -42,7 +42,7 @@ trait TransformOps[U] {
   */
 object TransformOps {
 
-  //todo maybe turn the whole transformation theory into Monoids (cats)
+  //todo maybe turn the whole transformation theory with scala cats
 
   implicit class PipelineOperator[U](value: U) {
     def ==>[V, W](target: V)(implicit appender: (U, V) => W): W = {

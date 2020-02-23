@@ -20,10 +20,8 @@
 package com.vbounyasit.bigdata.config
 
 import com.typesafe.config.{Config, ConfigFactory}
-import com.vbounyasit.bigdata.ETL.TableMetadata
 import com.vbounyasit.bigdata.args.ArgumentsConfiguration
 import com.vbounyasit.bigdata.config.OutputTablesInfo.ResultTables
-import com.vbounyasit.bigdata.exceptions.ExceptionHandler
 import com.vbounyasit.bigdata.{ApplicationConf, OutputTables}
 import pureconfig.ConfigReader
 
@@ -36,8 +34,8 @@ trait ConfigDefinition {
 
   implicit def function2ToOutputTablesInfo(function2: (_, _) => OutputTables): ResultTables = OutputTablesInfo(function2)
 
-  def loadConfig[T](configName: String, resourceName: String)(implicit reader: ConfigReader[T]): ApplicationConf[T] = {
-    Some(ConfigurationsLoader.loadConfig[T](configName, ConfigFactory.load(resourceName)))
+  def loadConfig[T](configName: String, config: Config)(implicit reader: ConfigReader[T]): ApplicationConf[T] = {
+    Some(ConfigurationsLoader.loadConfig[T](configName, config))
   }
 
   /**

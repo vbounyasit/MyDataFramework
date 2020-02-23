@@ -27,7 +27,6 @@ import com.vbounyasit.bigdata.config.data.SparkParamsConf
 import com.vbounyasit.bigdata.exceptions.ExceptionHandler
 import com.vbounyasit.bigdata.exceptions.ExceptionHandler.ConfigLoadingError
 import pureconfig.ConfigReader
-import pureconfig.error.ConfigReaderFailures
 
 /**
   * A case class representing the different configurations we want to load for our application.
@@ -79,19 +78,5 @@ object ConfigurationsLoader {
       .map(error => ConfigLoadingError(configName, error))
   }
 
-  /**
-    * Map the ConfigReaderFailures into a ConfigLoadingError
-    * from an already loaded configuration via pureconfig
-    *
-    * @param configName The name of the configuration
-    * @param config     The Config object loaded from a .conf file
-    * @tparam T The Configuration case class type
-    * @return Either the Configuration data or a configuration loading Exception
-    */
-  def loadConfig[T](configName: String, config: Either[ConfigReaderFailures, T]): Either[ExceptionHandler, _] = {
-    config
-      .left
-      .map(error => ConfigLoadingError(configName, error))
-  }
 
 }

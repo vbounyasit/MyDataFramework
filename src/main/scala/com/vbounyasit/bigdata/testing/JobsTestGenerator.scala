@@ -88,7 +88,7 @@ trait JobsTestGenerator extends TestComponents {
     val optionalJobParameters: OptionalJobParameters[Any, Any] = OptionalJobParameters(defaultApplicationConf, defaultJobArguments)
 
     sparkApplication.executionPlans.foreach {
-      case (jobName, ExecutionParameters(executionFunction, _)) => {
+      case (jobName, ExecutionParameters(executionFunction, _, _)) => {
         s"${jobName.capitalize}" should "Compute the right Result" in {
           /**
             * Extracting the job configuration

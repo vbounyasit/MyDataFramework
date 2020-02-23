@@ -23,16 +23,14 @@ import cats.implicits._
 import com.vbounyasit.bigdata.ETL._
 import com.vbounyasit.bigdata.appImplicits._
 import com.vbounyasit.bigdata.args.base.OutputArgumentsConf
-import com.vbounyasit.bigdata.config.ConfigurationsLoader.loadConfig
 import com.vbounyasit.bigdata.config.data.JobsConfig.{JobConf, JobSource}
 import com.vbounyasit.bigdata.config.data.SourcesConfig.SourcesConf
 import com.vbounyasit.bigdata.config.{ConfigDefinition, ConfigsExtractor, ConfigurationsLoader, OutputTablesInfo}
-import com.vbounyasit.bigdata.exceptions.ExceptionHandler
 import com.vbounyasit.bigdata.exceptions.ExceptionHandler._
 import com.vbounyasit.bigdata.providers.{LoggerProvider, SparkSessionProvider}
 import com.vbounyasit.bigdata.transform.ExecutionPlan
 import com.vbounyasit.bigdata.utils.MonadUtils._
-import com.vbounyasit.bigdata.utils.{CollectionsUtils, DateUtils, MonadUtils}
+import com.vbounyasit.bigdata.utils.{CollectionsUtils, DateUtils}
 import org.apache.spark.sql.functions.{lit, _}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
@@ -68,11 +66,8 @@ abstract class SparkApplication[U, V] extends SparkSessionProvider with ETL[U, V
 
     /**
       * Optional Application config
-      * TODO : Currently, a single config file defined in ConfigDefinition will be used for every job's configuration. Might want to define one file per job.
       */
-    val parsedApplicationConfiguration: Option[_] = configDefinition.applicationConf.map(conf =>
-      handleEither(conf)
-    )
+    val parsedApplicationConfiguration: Option[_] = configDefinition.applicationConf.map(handleEither)
 
     /**
       * Parsing of the global application configuration file and arguments
@@ -175,7 +170,7 @@ abstract class SparkApplication[U, V] extends SparkSessionProvider with ETL[U, V
           MergingMapKeyNotFound
         ).values
         /**
-          * Adding Optional custom arguments
+          * Adding Custom arguments
           */
         .map {
           case ((jobConf, tableMetadata), executionConfig) =>
@@ -186,10 +181,11 @@ abstract class SparkApplication[U, V] extends SparkSessionProvider with ETL[U, V
                 args
               ))
             })
+            val parsedJobConfiguration: Option[_] = executionConfig.additionalConfig.map(handleEither)
             JobFullExecutionParameters(
               jobConf,
               tableMetadata,
-              OptionalJobParameters(parsedApplicationConfiguration, parsedJobArguments),
+              OptionalJobParameters(parsedJobConfiguration, parsedJobArguments),
               executionConfig.executionFunction)
         }.toSeq
       logger.info("Successfully loaded parameters from configuration files")

@@ -24,6 +24,7 @@ import com.vbounyasit.bigdata.args.ArgumentsConfiguration
 import com.vbounyasit.bigdata.config.ConfigurationsLoader
 import com.vbounyasit.bigdata.config.data.JobsConfig.{JobConf, JobSource}
 import com.vbounyasit.bigdata.config.data.SourcesConfig.SourcesConf
+import com.vbounyasit.bigdata.exceptions.ExceptionHandler
 import com.vbounyasit.bigdata.transform.ExecutionPlan
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
@@ -77,7 +78,7 @@ trait ETL[U, V] {
     * Saves the resulting dataFrame to disk
     *
     * @param dataFrame             The resulting DataFrame
-    * @param outputTables              The output database and table
+    * @param outputTables          The output database and table
     * @param optionalJobParameters An OptionalJobParameters object containing any custom
     *                              argument/application files we defined through our application.
     */
@@ -162,7 +163,8 @@ object ETL {
                                                      arguments: Option[Argument])
 
   case class ExecutionParameters[GlobalConfig, GlobalArgument, Config, Argument](executionFunction: OptionalParameters[GlobalConfig, GlobalArgument, Config, Argument] => ExecutionPlan,
-                                                   additionalArguments: Option[ArgumentsConfiguration[Argument]] = None)
+                                                                                 additionalConfig: Option[Either[ExceptionHandler, Config]] = None,
+                                                                                 additionalArguments: Option[ArgumentsConfiguration[Argument]] = None)
 
   case class TableMetadata(database: String, table: String)
 
