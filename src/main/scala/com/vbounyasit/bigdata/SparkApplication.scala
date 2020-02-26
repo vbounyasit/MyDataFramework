@@ -241,8 +241,8 @@ abstract class SparkApplication[U, V] extends SparkSessionProvider with ETL[U, V
 
     def selectOutputColumns: DataFrame => DataFrame = dataFrame => {
       outputColumns match {
+        case None | Some(Nil) => dataFrame
         case Some(columns) => dataFrame.select(columns.map(col): _*)
-        case None => dataFrame
       }
     }
 

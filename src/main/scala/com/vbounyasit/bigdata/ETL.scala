@@ -30,6 +30,7 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
 
 /**
   * A trait defining the functions for an ETL operation.
+  * TODO get rid of those two generic types in ETL
   */
 trait ETL[U, V] {
 
@@ -78,12 +79,12 @@ trait ETL[U, V] {
     * Saves the resulting dataFrame to disk
     *
     * @param dataFrame             The resulting DataFrame
-    * @param outputTables          The output database and table
+    * @param outputTable          The output database and table
     * @param optionalJobParameters An OptionalJobParameters object containing any custom
     *                              argument/application files we defined through our application.
     */
   def load(dataFrame: DataFrame,
-           outputTables: TableMetadata,
+           outputTable: TableMetadata,
            optionalJobParameters: OptionalJobParameters[U, V]): Unit
 
 
@@ -95,8 +96,7 @@ trait ETL[U, V] {
   def runETL[GlobalConfig, GlobalArgument, Config, Argument, ConfigInput, ArgumentInput](executionData: ExecutionData[GlobalConfig, GlobalArgument]): Unit = {
     implicit val spark: SparkSession = executionData.spark
 
-    val globalApplicationConf: Option[GlobalConfig] = executionData.applicationConf
-    val globalArguments: Option[GlobalArgument] = executionData.applicationArguments
+    val globalParameters: OptionalJobParameters[GlobalConfig, GlobalArgument] = OptionalJobParameters(executionData.applicationConf, executionData.applicationArguments)
 
     executionData.jobFullExecutionParameters
       .foreach(jobParametersExistential => {
@@ -115,8 +115,8 @@ trait ETL[U, V] {
           //relying on runtime for this cast
           jobParameters.executionFunction(
             OptionalJobParameters(
-              globalApplicationConf,
-              globalArguments
+              globalParameters.applicationConfig,
+              globalParameters.arguments
             ),
             OptionalJobParameters(
               jobParameters.optionalJobParameters.applicationConfig.map(_.asInstanceOf[ConfigInput]),
@@ -130,7 +130,7 @@ trait ETL[U, V] {
         load(
           resultDataFrame,
           jobParameters.outputTable,
-          jobParameters.optionalJobParameters.asInstanceOf[OptionalJobParameters[U, V]]
+          globalParameters.asInstanceOf[OptionalJobParameters[U, V]]
         )
       })
   }
