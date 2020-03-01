@@ -21,19 +21,19 @@ package com.vbounyasit.bigdata.exceptions
 
 import pureconfig.error.ConfigReaderFailures
 
-abstract class ExceptionHandler extends Exception {
+abstract class ErrorHandler extends Exception {
   protected val exceptionType: String
   protected val constructedMessage: String
 
   override def getMessage: String = s"[ERROR]$exceptionType : $constructedMessage"
 }
 
-object ExceptionHandler {
+object ErrorHandler {
 
   /**
     * Exceptions related to a specific job.
     */
-  abstract class JobError(jobName: String) extends ExceptionHandler {
+  abstract class JobError(jobName: String) extends ErrorHandler {
     override protected val exceptionType: String = s"Job $jobName error"
   }
 
@@ -58,7 +58,7 @@ object ExceptionHandler {
   /**
     * Exceptions related to a job's input sources.
     */
-  abstract class JobSourcesError(jobName: String, sources: Seq[String]) extends ExceptionHandler {
+  abstract class JobSourcesError(jobName: String, sources: Seq[String]) extends ErrorHandler {
     protected val messageHeader: String
     override protected val exceptionType: String = s"Job $jobName - sources error"
     override protected lazy val constructedMessage: String = s"$messageHeader - ${sources.mkString(",")}."
@@ -75,27 +75,27 @@ object ExceptionHandler {
   /**
     * Other Exceptions
     */
-  case class JoinKeyMissingError() extends ExceptionHandler {
+  case class JoinKeyMissingError() extends ErrorHandler {
     override protected val exceptionType: String = "Join Error"
     override protected val constructedMessage: String = "No join keys were specified."
   }
 
-  case class ParseArgumentsError() extends ExceptionHandler {
+  case class ParseArgumentsError() extends ErrorHandler {
     override protected val exceptionType: String = "Argument error"
     override protected val constructedMessage: String = "Cannot parse arguments."
   }
 
-  case class ConfigLoadingError(configName: String, configErrors: ConfigReaderFailures) extends ExceptionHandler {
+  case class ConfigLoadingError(configName: String, configErrors: ConfigReaderFailures) extends ErrorHandler {
     override protected val exceptionType: String = s"Config loading error : $configName"
     override protected val constructedMessage: String = configErrors.toList.map(_.description).mkString("\n")
   }
 
-  case class NoOutputTablesSpecified() extends ExceptionHandler {
+  case class NoOutputTablesSpecified() extends ErrorHandler {
     override protected val exceptionType: String = "No output tables found"
     override protected val constructedMessage: String = "Please specify output tables in argument command line or the ConfigDefinition class"
   }
 
-  case class MergingMapKeyNotFound(key: String) extends ExceptionHandler {
+  case class MergingMapKeyNotFound(key: String) extends ErrorHandler {
     override protected val exceptionType: String = s"[$key] not found"
     override protected val constructedMessage: String = s"Cannot find [$key] in map for map merging procedure"
   }
@@ -103,7 +103,7 @@ object ExceptionHandler {
   /**
     * Test exceptions
     */
-  trait ReadDataFramesFromFilesError extends ExceptionHandler {
+  trait ReadDataFramesFromFilesError extends ErrorHandler {
     override protected val exceptionType: String = "DataFrame reading error"
   }
 
@@ -115,7 +115,7 @@ object ExceptionHandler {
     override protected val constructedMessage: String = s"File $dataFrameFileName not found for $jobName"
   }
 
-  case class CouldNotClearDirectory(folderPath: String) extends ExceptionHandler {
+  case class CouldNotClearDirectory(folderPath: String) extends ErrorHandler {
     override protected val exceptionType: String = "IO Error"
     override protected val constructedMessage: String = s"Could not clear directory : $folderPath."
   }

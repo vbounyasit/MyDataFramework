@@ -25,6 +25,5 @@ import org.apache.spark.sql.DataFrame
   * A Transformer object that will contain a DataFrame => DataFrame function
   */
 trait Transformer {
-
-  def transform(dataFrame: DataFrame): DataFrame
+  val transform: DataFrame => DataFrame
 }

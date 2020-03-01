@@ -24,9 +24,9 @@ import cats.implicits._
 import com.vbounyasit.bigdata.Sources
 import com.vbounyasit.bigdata.config.data.JobsConfig.{JobConf, JobSource, JobsConf}
 import com.vbounyasit.bigdata.config.data.SourcesConfig.SourcesConf
-import com.vbounyasit.bigdata.exceptions.ExceptionHandler.{JobNotFoundError, JobSourcesDuplicatesFoundError, JobSourcesError, JobSourcesNotFoundError}
+import com.vbounyasit.bigdata.exceptions.ErrorHandler.{JobNotFoundError, JobSourcesDuplicatesFoundError, JobSourcesError, JobSourcesNotFoundError}
 import com.vbounyasit.bigdata.implicits._
-import com.vbounyasit.bigdata.transform.TransformOps._
+import com.vbounyasit.bigdata.transform.implicits._
 import com.vbounyasit.bigdata.transform.pipeline.impl.SourcePipeline
 import com.vbounyasit.bigdata.utils.MonadUtils
 import org.apache.spark.sql.functions.col

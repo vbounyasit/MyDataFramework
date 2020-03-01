@@ -20,7 +20,7 @@
 package com.vbounyasit
 
 import com.vbounyasit.bigdata.ETL.TableMetadata
-import com.vbounyasit.bigdata.exceptions.ExceptionHandler
+import com.vbounyasit.bigdata.exceptions.ErrorHandler
 import com.vbounyasit.bigdata.transform.ExecutionPlan
 import com.vbounyasit.bigdata.transform.pipeline.impl.SourcePipeline
 import pureconfig.error.ConfigReaderFailures
@@ -29,10 +29,10 @@ package object bigdata {
 
   type Sources = Map[String, SourcePipeline]
   type ExecutionPlans = Map[String, ExecutionPlan]
-  type EitherRP = Either[ExceptionHandler, SourcePipeline]
-  type ApplicationConf[T] = Option[Either[ExceptionHandler, T]]
+  type EitherRP = Either[ErrorHandler, SourcePipeline]
+  type ApplicationConf[T] = Option[Either[ErrorHandler, T]]
   type PureConfigLoaded[T] = Either[ConfigReaderFailures, T]
-  type ExceptionWithMessage[T <: ExceptionHandler] = String => T
+  type ExceptionWithMessage[T <: ErrorHandler] = String => T
   type OutputTables = Option[Seq[TableMetadata]]
 
   case class DatePattern(pattern: String)

@@ -19,7 +19,7 @@
 
 package com.vbounyasit.bigdata
 
-import com.vbounyasit.bigdata.exceptions.ExceptionHandler
+import com.vbounyasit.bigdata.exceptions.ErrorHandler
 import com.vbounyasit.bigdata.providers.LoggerProvider
 
 /**
@@ -31,8 +31,9 @@ object appImplicits {
 
   /**
     * Allow us to handle Either objects while logging in between the operations
+    * TODO: cats has something very powerful for either log handling
     */
-  implicit class LogEither[T](either: Either[ExceptionHandler, T]) extends LoggerProvider {
+  implicit class LogEither[T](either: Either[ErrorHandler, T]) extends LoggerProvider {
 
     def info(info: String): T = log(info, logger.info)
 

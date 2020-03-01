@@ -21,7 +21,7 @@ package com.vbounyasit.bigdata.utils
 
 import cats.implicits._
 import com.vbounyasit.bigdata.ExceptionWithMessage
-import com.vbounyasit.bigdata.exceptions.ExceptionHandler
+import com.vbounyasit.bigdata.exceptions.ErrorHandler
 
 /**
   * Utilities related to Monad operations
@@ -31,16 +31,16 @@ object MonadUtils {
   /**
     * Automatically handle either exceptions
     */
-  def handleEither[T](either: Either[ExceptionHandler, T]): T = either match {
+  def handleEither[T](either: Either[ErrorHandler, T]): T = either match {
     case Right(result) => result
     case Left(error) => throw error
   }
 
-  def optionToEither[T, V <: ExceptionHandler](option: Option[T], left: V): Either[V, T] = {
+  def optionToEither[T, V <: ErrorHandler](option: Option[T], left: V): Either[V, T] = {
     Either.cond(option.isDefined, option.get, left)
   }
 
-  def getMapSubList[K, V, Error <: ExceptionHandler](keySubSeq: List[K], dataMap: Map[K, V], errorNotFound: ExceptionWithMessage[Error])(implicit keyConverter: K => String): Either[Error, Map[K, V]] = {
+  def getMapSubList[K, V, Error <: ErrorHandler](keySubSeq: List[K], dataMap: Map[K, V], errorNotFound: ExceptionWithMessage[Error])(implicit keyConverter: K => String): Either[Error, Map[K, V]] = {
     def toEither[U](key: K, option: Option[(K, U)]): Either[Error, (K, U)] = Either.cond(option.isDefined, option.get, errorNotFound(keyConverter(key)))
     keySubSeq
       .map(key => (key, dataMap.get(key).map(key -> _)))

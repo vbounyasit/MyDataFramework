@@ -19,7 +19,7 @@
 
 package com.vbounyasit.bigdata
 
-import com.vbounyasit.bigdata.exceptions.ExceptionHandler
+import com.vbounyasit.bigdata.exceptions.ErrorHandler
 import com.vbounyasit.bigdata.utils.MonadUtils
 import org.apache.spark.sql.types.StringType
 
@@ -32,6 +32,6 @@ package object testing {
   val none = "N/A"
   val maxHistoryRecords = 5
 
-  implicit def handleEither[T]: Either[ExceptionHandler, T] => T = MonadUtils.handleEither
+  implicit def handleEither[T]: Either[ErrorHandler, T] => T = MonadUtils.handleEither
 
 }

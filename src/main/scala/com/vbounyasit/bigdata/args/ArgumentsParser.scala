@@ -19,7 +19,7 @@
 
 package com.vbounyasit.bigdata.args
 
-import com.vbounyasit.bigdata.exceptions.ExceptionHandler.ParseArgumentsError
+import com.vbounyasit.bigdata.exceptions.ErrorHandler.ParseArgumentsError
 import com.vbounyasit.bigdata.utils.MonadUtils
 import scopt.{OParser, OParserBuilder}
 

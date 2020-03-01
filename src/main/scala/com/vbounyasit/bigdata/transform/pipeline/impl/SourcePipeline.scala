@@ -19,9 +19,9 @@
 
 package com.vbounyasit.bigdata.transform.pipeline.impl
 
-import com.vbounyasit.bigdata.exceptions.ExceptionHandler.JoinKeyMissingError
+import com.vbounyasit.bigdata.exceptions.ErrorHandler.JoinKeyMissingError
 import com.vbounyasit.bigdata.implicits._
-import com.vbounyasit.bigdata.transform.TransformOps._
+import com.vbounyasit.bigdata.transform.implicits._
 import com.vbounyasit.bigdata.transform.joiner.Joiner
 import com.vbounyasit.bigdata.transform.joiner.JoinerKeys.{CommonKey, JoinKey, KeyProjection}
 import com.vbounyasit.bigdata.utils.CollectionsUtils

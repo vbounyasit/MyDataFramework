@@ -24,8 +24,10 @@ import com.typesafe.config.Config
 import com.vbounyasit.bigdata.config.data.JobsConfig.JobsConf
 import com.vbounyasit.bigdata.config.data.SourcesConfig.SourcesConf
 import com.vbounyasit.bigdata.config.data.SparkParamsConf
-import com.vbounyasit.bigdata.exceptions.ExceptionHandler
-import com.vbounyasit.bigdata.exceptions.ExceptionHandler.ConfigLoadingError
+import com.vbounyasit.bigdata.exceptions.ErrorHandler
+import com.vbounyasit.bigdata.exceptions.ErrorHandler.ConfigLoadingError
+import com.vbounyasit.bigdata.providers.SparkSessionProvider
+import org.apache.spark.sql.SparkSession
 import pureconfig.ConfigReader
 
 /**
@@ -35,11 +37,12 @@ import pureconfig.ConfigReader
   * @param sourcesConf     The configuration for the pool of sources we want to extract data from
   * @param jobsConf        The configuration related to our processing jobs
   */
-case class ConfigurationsLoader(sparkParamsConf: SparkParamsConf,
+case class ConfigurationsLoader(spark: SparkSession,
+                                sparkParamsConf: SparkParamsConf,
                                 sourcesConf: SourcesConf,
                                 jobsConf: JobsConf)
 
-object ConfigurationsLoader {
+object ConfigurationsLoader extends SparkSessionProvider {
 
   /**
     * Loads a set of configuration data through a provided ConfigDefinition
@@ -48,17 +51,23 @@ object ConfigurationsLoader {
     * @param useLocalSparkParams Whether or not to use the local params for spark
     * @return Either the ConfigurationsLoader object containing the loaded data or an Exception
     */
-  def apply(configDefinition: ConfigDefinition, useLocalSparkParams: Boolean = false): Either[ExceptionHandler, ConfigurationsLoader] = {
+  def apply(configDefinition: ConfigDefinition, useLocalSparkParams: Boolean = false): Either[ErrorHandler, ConfigurationsLoader] = {
     import pureconfig.generic.auto._
     for {
       sparkParamsConf <- {
         val conf = if (useLocalSparkParams) configDefinition.sparkLocalConf else configDefinition.sparkConf
         loadConfig[SparkParamsConf]("Spark conf", conf)
       }
-      sourcesConf <- loadConfig[SourcesConf]("Sources conf", configDefinition.sourcesConf)
-      jobsConf <- loadConfig[JobsConf]("Jobs conf", configDefinition.jobsConf)
+      spark <- Right(getSparkSession(sparkParamsConf))
+
+      sourcesConf <- {
+        loadConfig[SourcesConf]("Sources conf", configDefinition.sourcesConf(spark))
+      }
+      jobsConf <- {
+        loadConfig[JobsConf]("Jobs conf", configDefinition.jobsConf(spark))
+      }
     } yield {
-      ConfigurationsLoader(sparkParamsConf, sourcesConf, jobsConf)
+      ConfigurationsLoader(spark, sparkParamsConf, sourcesConf, jobsConf)
     }
   }
 
@@ -71,7 +80,7 @@ object ConfigurationsLoader {
     * @tparam T The Configuration case class type
     * @return Either the Configuration data or a configuration loading Exception
     */
-  def loadConfig[T](configName: String, config: Config)(implicit reader: ConfigReader[T]): Either[ExceptionHandler, T] = {
+  def loadConfig[T](configName: String, config: Config)(implicit reader: ConfigReader[T]): Either[ErrorHandler, T] = {
     pureconfig
       .loadConfig[T](config)
       .left
