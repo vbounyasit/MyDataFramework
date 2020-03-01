@@ -125,6 +125,7 @@ trait ETL[U, V] {
           Some(jobParameters.jobConf.outputMetadata.outputColumns),
           Some(jobParameters.jobConf.outputMetadata.dateColumn)
         )
+
         //load
         load(
           resultDataFrame,

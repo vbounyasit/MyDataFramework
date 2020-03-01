@@ -23,7 +23,7 @@ import cats.kernel.Semigroup
 import com.vbounyasit.bigdata.ETL.{ExecutionConfig, ExecutionConfigs}
 import com.vbounyasit.bigdata.exceptions.ErrorHandler.JobSourcesNotFoundError
 import com.vbounyasit.bigdata.transform.ExecutionPlan
-import com.vbounyasit.bigdata.transform.pipeline.impl.SourcePipeline
+import com.vbounyasit.bigdata.transform.pipeline.SourcePipeline
 import org.apache.spark.sql.DataFrame
 
 /**

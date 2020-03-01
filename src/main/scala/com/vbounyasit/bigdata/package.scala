@@ -22,7 +22,7 @@ package com.vbounyasit
 import com.vbounyasit.bigdata.ETL.TableMetadata
 import com.vbounyasit.bigdata.exceptions.ErrorHandler
 import com.vbounyasit.bigdata.transform.ExecutionPlan
-import com.vbounyasit.bigdata.transform.pipeline.impl.SourcePipeline
+import com.vbounyasit.bigdata.transform.pipeline.SourcePipeline
 import pureconfig.error.ConfigReaderFailures
 
 package object bigdata {

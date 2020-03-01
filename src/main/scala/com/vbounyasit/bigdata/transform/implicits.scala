@@ -22,7 +22,8 @@ package com.vbounyasit.bigdata.transform
 import cats.implicits._
 import com.vbounyasit.bigdata.EitherRP
 import com.vbounyasit.bigdata.transform.joiner.Joiner
-import com.vbounyasit.bigdata.transform.pipeline.impl.{Pipeline, SourcePipeline}
+import com.vbounyasit.bigdata.transform.pipeline.{Pipeline, SourcePipeline}
+import com.vbounyasit.bigdata.transform.pipeline.Pipeline
 import org.apache.spark.sql.DataFrame
 
 /**
