@@ -17,7 +17,7 @@
  * limitations under the License.
  */
 
-package com.vbounyasit.bigdata.transform.pipeline.impl
+package com.vbounyasit.bigdata.transform.pipeline
 
 import com.vbounyasit.bigdata.transform.Transformer
 

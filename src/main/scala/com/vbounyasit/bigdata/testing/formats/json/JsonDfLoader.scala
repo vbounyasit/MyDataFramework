@@ -19,7 +19,7 @@
 
 package com.vbounyasit.bigdata.testing.formats.json
 
-import com.vbounyasit.bigdata.exceptions.ExceptionHandler.ReadDataFramesFromFilesError
+import com.vbounyasit.bigdata.exceptions.ErrorHandler.ReadDataFramesFromFilesError
 import com.vbounyasit.bigdata.testing.data.JobTableMetadata
 import com.vbounyasit.bigdata.testing.formats.DataFrameIO.DataFrameLoader
 import org.apache.spark.rdd.RDD

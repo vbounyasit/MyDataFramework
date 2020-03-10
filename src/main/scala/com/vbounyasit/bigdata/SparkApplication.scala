@@ -25,8 +25,9 @@ import com.vbounyasit.bigdata.appImplicits._
 import com.vbounyasit.bigdata.args.base.OutputArgumentsConf
 import com.vbounyasit.bigdata.config.data.JobsConfig.{JobConf, JobSource}
 import com.vbounyasit.bigdata.config.data.SourcesConfig.SourcesConf
-import com.vbounyasit.bigdata.config.{ConfigDefinition, ConfigsExtractor, ConfigurationsLoader, OutputTablesInfo}
-import com.vbounyasit.bigdata.exceptions.ExceptionHandler._
+import com.vbounyasit.bigdata.config.{ConfigDefinition, ConfigsExtractor, ConfigurationsLoader, OutputTablesGenerator}
+import com.vbounyasit.bigdata.exceptions.ErrorHandler
+import com.vbounyasit.bigdata.exceptions.ErrorHandler._
 import com.vbounyasit.bigdata.providers.{LoggerProvider, SparkSessionProvider}
 import com.vbounyasit.bigdata.transform.ExecutionPlan
 import com.vbounyasit.bigdata.utils.MonadUtils._
@@ -64,33 +65,36 @@ abstract class SparkApplication[U, V] extends SparkSessionProvider with ETL[U, V
     */
   protected def loadExecutionData(args: Array[String]): ExecutionData[_, _] = {
 
-    /**
-      * Optional Application config
-      */
-    val parsedApplicationConfiguration: Option[_] = configDefinition.applicationConf.map(handleEither)
+    def toEitherOfOptional(value: Option[Either[ErrorHandler, _]]): Either[ErrorHandler, Option[_]] =
+      value match {
+        case Some(either) => either.map(Some.apply)
+        case None => Right(None)
+      }
 
-    /**
-      * Parsing of the global application configuration file and arguments
-      */
-    val parsedApplicationArguments: Option[_] = {
-      configDefinition.applicationArguments.map(argsConf => {
-        val argumentParser = argsConf.argumentParser
-        handleEither(
-          argumentParser.parseArguments(
-          "",
-          args
-        ))
-      })
-    }
-
-    handleEither(for {
+    (for {
       /**
         * Loading configuration files
         */
       loadedConfigurations <- ConfigurationsLoader(configDefinition)
 
       /**
-        * Arguments parsing
+        * Parsing global Application configuration
+        */
+      parsedApplicationConfiguration <- toEitherOfOptional(configDefinition.applicationConf)
+
+      /**
+        * Parsing global Application argument parameters
+        */
+      parsedApplicationArguments <- toEitherOfOptional {
+        configDefinition.applicationArguments.map(
+          _.argumentParser.parseArguments(
+            loadedConfigurations.sparkParamsConf.appName,
+            args
+          ))
+      }
+
+      /**
+        * Compulsory arguments parsing (like environment, job to launch, etc)
         */
       parsedBaseArgument <- {
         val argumentsConfiguration = new OutputArgumentsConf
@@ -106,16 +110,16 @@ abstract class SparkApplication[U, V] extends SparkSessionProvider with ETL[U, V
       tablesToCompute <- {
         val parsedApplicationInfo = (parsedApplicationConfiguration, parsedApplicationArguments)
         /**
-          * Making sure we have an application conf or application arguments defined
+          * The output tables defined in configDefinition must take a conf or an argument object to be valid
           */
         val configuredOutputTables: OutputTables = configDefinition.outputTables match {
-          case tableInfo @ OutputTablesInfo(Some(_), None) => parsedApplicationInfo match {
+          case tableInfo@OutputTablesGenerator(Some(_), None) => parsedApplicationInfo match {
             case (Some(appConf), None) => tableInfo.applyFunction1(appConf)
             case (None, Some(arguments)) => tableInfo.applyFunction1(arguments)
             case (Some(appConf), Some(arguments)) => Try(tableInfo.applyFunction1(appConf)).getOrElse(tableInfo.applyFunction1(arguments))
             case _ => None
           }
-          case tableInfo @ OutputTablesInfo(None, Some(_)) => parsedApplicationInfo match {
+          case tableInfo@OutputTablesGenerator(None, Some(_)) => parsedApplicationInfo match {
             case (Some(appConf), Some(arguments)) => tableInfo.applyFunction2(appConf, arguments)
             case _ => None
           }
@@ -136,10 +140,7 @@ abstract class SparkApplication[U, V] extends SparkSessionProvider with ETL[U, V
       /**
         * Loading jobs conf
         */
-      jobsConf <- {
-        ConfigsExtractor
-          .getJobs(tablesToCompute.map(_.table), loadedConfigurations.jobsConf)
-      }
+      jobsConf <- ConfigsExtractor.getJobs(tablesToCompute.map(_.table), loadedConfigurations.jobsConf)
 
       /**
         * Loading execution parameters
@@ -148,57 +149,68 @@ abstract class SparkApplication[U, V] extends SparkSessionProvider with ETL[U, V
         implicit val spark: SparkSession = getSparkSession(loadedConfigurations.sparkParamsConf)
         getMapSubList(tablesToCompute.map(_.table).toList, executionPlans, ExecutionPlanNotFoundError)
       }
-    } yield {
-      val spark: SparkSession = getSparkSession(loadedConfigurations.sparkParamsConf)
 
       /**
         * Merging with the list of output tables
         */
-      val jobsConfWithOutputMetadata: Map[String, (JobConf, TableMetadata)] = CollectionsUtils.mergeByKeyStrict(
+      jobsConfWithOutputMetadata <- CollectionsUtils.mergeByKeyStrict(
         jobsConf,
         tablesToCompute.map(metadata => (metadata.table, metadata)).toMap,
         MergingMapKeyNotFound
       )
 
       /**
-        * Building the final Job parameters object
+        * Merging with the execution parameters
         */
-      val jobFullExecutionParameters = CollectionsUtils
-        .mergeByKeyStrict(
-          jobsConfWithOutputMetadata,
-          executionsParameters,
-          MergingMapKeyNotFound
-        ).values
-        /**
-          * Adding Custom arguments
-          */
-        .map {
-          case ((jobConf, tableMetadata), executionConfig) =>
-            val parsedJobArguments: Option[_] = executionConfig.additionalArguments.map(argsConf => {
-              val argumentParser = argsConf.argumentParser
-              handleEither(argumentParser.parseArguments(
-                loadedConfigurations.sparkParamsConf.appName,
-                args
-              ))
-            })
-            val parsedJobConfiguration: Option[_] = executionConfig.additionalConfig.map(handleEither)
-            JobFullExecutionParameters(
-              jobConf,
-              tableMetadata,
-              OptionalJobParameters(parsedJobConfiguration, parsedJobArguments),
-              executionConfig.executionFunction)
-        }.toSeq
-      logger.info("Successfully loaded parameters from configuration files")
+      withExecutionParameters <- CollectionsUtils.mergeByKeyStrict(
+        jobsConfWithOutputMetadata,
+        executionsParameters,
+        MergingMapKeyNotFound
+      )
 
+
+      /**
+        * Parsing the job arguments and configurations
+        */
+      jobFullExecutionParameters <- {
+
+        withExecutionParameters
+          .values
+          .map {
+            case ((jobConf, tableMetadata), executionConfig) =>
+              val parsedJobConfiguration: Either[ErrorHandler, Option[_]] = toEitherOfOptional(executionConfig.additionalConfig)
+              val parsedJobArguments: Either[ErrorHandler, Option[_]] = toEitherOfOptional(executionConfig.additionalArguments.map(argsConf => {
+                argsConf.argumentParser.parseArguments(
+                  loadedConfigurations.sparkParamsConf.appName,
+                  args
+                )
+              }))
+              for {
+                jobConfig <- parsedJobConfiguration
+                jobArguments <- parsedJobArguments
+              } yield
+                JobExecutionParameters(
+                  jobConf,
+                  tableMetadata,
+                  JobParameters(jobConfig, jobArguments),
+                  executionConfig.executionFunction
+                )
+          }.toList.sequence
+      }
+    } yield {
       ExecutionData(
         loadedConfigurations,
         parsedApplicationConfiguration,
         parsedApplicationArguments,
-        jobFullExecutionParameters,
-        spark,
+        jobFullExecutionParameters.toSeq,
+        loadedConfigurations.spark,
         parsedBaseArgument.env
       )
     })
+    match {
+      case Right(executionData) => executionData
+      case Left(errorHandler) => throw errorHandler
+    }
   }
 
   /**

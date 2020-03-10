@@ -23,7 +23,7 @@ import com.typesafe.config.ConfigFactory
 import com.vbounyasit.bigdata.config.ConfigurationsLoader
 import com.vbounyasit.bigdata.config.data.SparkParamsConf
 import com.vbounyasit.bigdata.testing.common.TestComponents
-import com.vbounyasit.bigdata.transform.pipeline.impl.SourcePipeline
+import com.vbounyasit.bigdata.transform.pipeline.SourcePipeline
 import org.apache.spark.sql.functions.col
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import pureconfig.generic.auto._

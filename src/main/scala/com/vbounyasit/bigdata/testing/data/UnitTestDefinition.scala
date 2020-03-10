@@ -19,9 +19,9 @@
 
 package com.vbounyasit.bigdata.testing.data
 
-import com.vbounyasit.bigdata.transform.TransformOps._
+import com.vbounyasit.bigdata.transform.implicits._
 import com.vbounyasit.bigdata.transform.Transformer
-import com.vbounyasit.bigdata.transform.pipeline.impl.Pipeline
+import com.vbounyasit.bigdata.transform.pipeline.Pipeline
 import org.apache.spark.sql.types.{DataType, StructField, StructType}
 import org.apache.spark.sql.{DataFrame, Row, SparkSession}
 

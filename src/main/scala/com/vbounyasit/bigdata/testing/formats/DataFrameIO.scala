@@ -21,7 +21,7 @@ package com.vbounyasit.bigdata.testing.formats
 
 import java.io.File
 
-import com.vbounyasit.bigdata.exceptions.ExceptionHandler.{CorruptedResourceFile, ReadDataFramesFromFilesError, ResourcesDataFileNotFound}
+import com.vbounyasit.bigdata.exceptions.ErrorHandler.{CorruptedResourceFile, ReadDataFramesFromFilesError, ResourcesDataFileNotFound}
 import com.vbounyasit.bigdata.testing.data.JobTableMetadata
 import com.vbounyasit.bigdata.utils.IOUtils
 import org.apache.spark.sql.{DataFrame, SparkSession}

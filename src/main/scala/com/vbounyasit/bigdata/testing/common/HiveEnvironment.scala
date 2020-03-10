@@ -24,7 +24,7 @@ import cats.implicits._
 import com.vbounyasit.bigdata.config.ConfigsExtractor
 import com.vbounyasit.bigdata.config.data.JobsConfig.JobsConf
 import com.vbounyasit.bigdata.config.data.SourcesConfig.SourcesConf
-import com.vbounyasit.bigdata.exceptions.ExceptionHandler.{JobSourcesNotFoundError, ReadDataFramesFromFilesError}
+import com.vbounyasit.bigdata.exceptions.ErrorHandler.{JobSourcesNotFoundError, ReadDataFramesFromFilesError}
 import com.vbounyasit.bigdata.implicits._
 import com.vbounyasit.bigdata.providers.LoggerProvider
 import com.vbounyasit.bigdata.testing.data.JobTableMetadata

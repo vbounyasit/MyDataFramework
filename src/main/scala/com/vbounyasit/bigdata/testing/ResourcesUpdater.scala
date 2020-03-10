@@ -26,7 +26,7 @@ import cats.implicits._
 import com.vbounyasit.bigdata.SparkApplication
 import com.vbounyasit.bigdata.config.data.JobsConfig.JobSource
 import com.vbounyasit.bigdata.config.{ConfigsExtractor, ConfigurationsLoader}
-import com.vbounyasit.bigdata.exceptions.ExceptionHandler.{JobSourcesNotFoundError, ReadDataFramesFromFilesError}
+import com.vbounyasit.bigdata.exceptions.ErrorHandler.{JobSourcesNotFoundError, ReadDataFramesFromFilesError}
 import com.vbounyasit.bigdata.implicits._
 import com.vbounyasit.bigdata.providers.{LoggerProvider, SparkSessionProvider}
 import com.vbounyasit.bigdata.testing.ResourcesUpdater.History
@@ -126,7 +126,7 @@ abstract class ResourcesUpdater extends SparkSessionProvider with LoggerProvider
   def runResourceUpdates(env: String = environment): Unit = {
     val loadedConfigurations = ConfigurationsLoader(sparkApplication.configDefinition, useLocalSparkParams = true)
 
-    implicit val spark: SparkSession = getSparkSession(loadedConfigurations.sparkParamsConf)
+    implicit val spark: SparkSession = loadedConfigurations.spark
 
     val sourcesToUpdate: List[Validated[JobSourcesNotFoundError, (JobTableMetadata, JobSource)]] = loadedConfigurations.jobsConf.jobs.flatMap {
       case (jobName, jobConf) =>

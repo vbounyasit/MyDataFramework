@@ -19,12 +19,18 @@
 
 package com.vbounyasit.bigdata.transform
 
+import org.apache.spark.sql.DataFrame
+
 /**
   * Traits representing our pool of transformers/pipelines
   */
 object TransformComponents {
 
-  trait Transformers
+  trait Transformers {
+    implicit def toTransformer(function: DataFrame => DataFrame): Transformer = new Transformer {
+      override val transform: DataFrame => DataFrame = function
+    }
+  }
 
   trait ExecutionPipelines {
     val transformers: Transformers

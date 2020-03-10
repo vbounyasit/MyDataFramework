@@ -21,7 +21,7 @@ package com.vbounyasit.bigdata.utils
 
 import java.io.File
 
-import com.vbounyasit.bigdata.exceptions.ExceptionHandler.CouldNotClearDirectory
+import com.vbounyasit.bigdata.exceptions.ErrorHandler.CouldNotClearDirectory
 import org.apache.commons.io.FileUtils
 
 import scala.util.Try

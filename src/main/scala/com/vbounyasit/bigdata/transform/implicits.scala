@@ -22,7 +22,8 @@ package com.vbounyasit.bigdata.transform
 import cats.implicits._
 import com.vbounyasit.bigdata.EitherRP
 import com.vbounyasit.bigdata.transform.joiner.Joiner
-import com.vbounyasit.bigdata.transform.pipeline.impl.{Pipeline, SourcePipeline}
+import com.vbounyasit.bigdata.transform.pipeline.{Pipeline, SourcePipeline}
+import com.vbounyasit.bigdata.transform.pipeline.Pipeline
 import org.apache.spark.sql.DataFrame
 
 /**
@@ -30,7 +31,7 @@ import org.apache.spark.sql.DataFrame
   *
   * @tparam U The type we want to define such operations on
   */
-trait TransformOps[U] {
+trait implicits[U] {
   def join(toJoin: U, joinWith: U, joiner: Joiner): EitherRP
 
   def union(toUnion: U, unionWith: U): U
@@ -40,7 +41,7 @@ trait TransformOps[U] {
   * [Important : import these functions in any class we want to perform data processing operations)
   * An object containing all the implicits needed for performing transformations in the execution plan
   */
-object TransformOps {
+object implicits {
 
   //todo maybe turn the whole transformation theory with scala cats
 
@@ -49,10 +50,10 @@ object TransformOps {
       appender(value, target)
     }
 
-    def join(joinWith: U, joiner: Joiner)(implicit transformOps: TransformOps[U]): EitherRP = {
+    def join(joinWith: U, joiner: Joiner)(implicit transformOps: implicits[U]): EitherRP = {
       transformOps.join(value, joinWith, joiner)
     }
-    def union(unionWith: U)(implicit transformOps: TransformOps[U]): U = {
+    def union(unionWith: U)(implicit transformOps: implicits[U]): U = {
       transformOps.union(value, unionWith)
     }
   }
@@ -62,7 +63,7 @@ object TransformOps {
   implicit def transformerToPipeline: Transformer => Pipeline = Seq(_)
 
   implicit def functionToPipeline: (DataFrame => DataFrame) => Pipeline = f => new Transformer {
-    override def transform(dataFrame: DataFrame): DataFrame = f(dataFrame)
+    override val transform: DataFrame => DataFrame = f
   }
 
   implicit def ToPipelineAppender[U, V, W](implicit
@@ -93,7 +94,7 @@ object TransformOps {
     * Operations
     */
 
-  implicit def sPipelineOperations: TransformOps[SourcePipeline] = new TransformOps[SourcePipeline] {
+  implicit def sPipelineOperations: implicits[SourcePipeline] = new implicits[SourcePipeline] {
     override def join(toJoin: SourcePipeline, joinWith: SourcePipeline, joiner: Joiner): EitherRP =
       toJoin.join(joinWith, joiner)
 
@@ -101,7 +102,7 @@ object TransformOps {
       toUnion.union(unionWith)
   }
 
-  implicit def eitherSPipelineOperations: TransformOps[EitherRP] = new TransformOps[EitherRP] {
+  implicit def eitherSPipelineOperations: implicits[EitherRP] = new implicits[EitherRP] {
     override def join(toJoin: EitherRP, joinWith: EitherRP, joiner: Joiner): EitherRP =
       for {
         lPipeline <- toJoin
@@ -121,7 +122,7 @@ object TransformOps {
     * Converters
     */
   implicit def toTransformer(function: DataFrame => DataFrame): Transformer = new Transformer {
-    override def transform(dataFrame: DataFrame): DataFrame = function(dataFrame)
+    override val transform: DataFrame => DataFrame = function
   }
 
 }

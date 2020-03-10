@@ -21,8 +21,9 @@ package com.vbounyasit.bigdata.config
 
 import com.typesafe.config.{Config, ConfigFactory}
 import com.vbounyasit.bigdata.args.ArgumentsConfiguration
-import com.vbounyasit.bigdata.config.OutputTablesInfo.ResultTables
+import com.vbounyasit.bigdata.config.OutputTablesGenerator.ResultTables
 import com.vbounyasit.bigdata.{ApplicationConf, OutputTables}
+import org.apache.spark.sql.SparkSession
 import pureconfig.ConfigReader
 
 /**
@@ -30,9 +31,13 @@ import pureconfig.ConfigReader
   */
 trait ConfigDefinition {
 
-  implicit def function1ToOutputTablesInfo(function1: _ => OutputTables): ResultTables = OutputTablesInfo(function1)
+  type SparkDependentConfig = SparkSession => Config
 
-  implicit def function2ToOutputTablesInfo(function2: (_, _) => OutputTables): ResultTables = OutputTablesInfo(function2)
+  implicit def function1ToOutputTablesInfo(function1: _ => OutputTables): ResultTables = OutputTablesGenerator(function1)
+
+  implicit def function2ToOutputTablesInfo(function2: (_, _) => OutputTables): ResultTables = OutputTablesGenerator(function2)
+
+  implicit def toSparkDependentConfig(config: Config): SparkDependentConfig = _ => config
 
   def loadConfig[T](configName: String, config: Config)(implicit reader: ConfigReader[T]): ApplicationConf[T] = {
     Some(ConfigurationsLoader.loadConfig[T](configName, config))
@@ -51,12 +56,12 @@ trait ConfigDefinition {
   /**
     * The configuration related to the different input sources we can use.
     */
-  val sourcesConf: Config
+  val sourcesConf: SparkDependentConfig
 
   /**
     * The configuration for the different jobs we have.
     */
-  val jobsConf: Config
+  val jobsConf: SparkDependentConfig
 
   /**
     * An optional configuration file related to our application.

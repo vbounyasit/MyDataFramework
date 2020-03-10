@@ -19,15 +19,15 @@
 
 package com.vbounyasit.bigdata.testing
 
-import com.vbounyasit.bigdata.ETL.{ExecutionParameters, OptionalJobParameters}
+import com.vbounyasit.bigdata.ETL.{ExecutionConfigs, JobParameters}
 import com.vbounyasit.bigdata.appImplicits._
 import com.vbounyasit.bigdata.config.data.JobsConfig.JobConf
 import com.vbounyasit.bigdata.config.{ConfigsExtractor, ConfigurationsLoader}
-import com.vbounyasit.bigdata.exceptions.ExceptionHandler.ReadDataFramesFromFilesError
+import com.vbounyasit.bigdata.exceptions.ErrorHandler.ReadDataFramesFromFilesError
 import com.vbounyasit.bigdata.testing.common.{HiveEnvironment, TestComponents}
 import com.vbounyasit.bigdata.testing.data.JobTableMetadata
 import com.vbounyasit.bigdata.testing.formats.DataFrameIO.DataFrameWriter
-import com.vbounyasit.bigdata.transform.TransformOps._
+import com.vbounyasit.bigdata.transform.implicits._
 import com.vbounyasit.bigdata.{Sources, SparkApplication}
 import org.apache.spark.sql.expressions.Window
 import org.apache.spark.sql.functions._
@@ -76,7 +76,7 @@ trait JobsTestGenerator extends TestComponents {
     val loadedConfigurations = ConfigurationsLoader(sparkApplication.configDefinition, useLocalSparkParams = true)
       .info("Successfully loaded configurations for local run.")
 
-    implicit val spark: SparkSession = getSparkSession(loadedConfigurations.sparkParamsConf)
+    implicit val spark: SparkSession = loadedConfigurations.spark
 
     "Hive Environment" should "successfully setup all the required source tables" in {
       hiveEnvironment.setupEnvironment(loadedConfigurations.jobsConf, loadedConfigurations.sourcesConf, env)
@@ -84,11 +84,11 @@ trait JobsTestGenerator extends TestComponents {
     }
 
     //todo change application conf to job conf
-    val optionalApplicationParameters: OptionalJobParameters[Any, Any] = OptionalJobParameters(defaultApplicationConf, defaultApplicationArguments)
-    val optionalJobParameters: OptionalJobParameters[Any, Any] = OptionalJobParameters(defaultApplicationConf, defaultJobArguments)
+    val optionalApplicationParameters: JobParameters[Any, Any] = JobParameters(defaultApplicationConf, defaultApplicationArguments)
+    val optionalJobParameters: JobParameters[Any, Any] = JobParameters(defaultApplicationConf, defaultJobArguments)
 
     sparkApplication.executionPlans.foreach {
-      case (jobName, ExecutionParameters(executionFunction, _, _)) => {
+      case (jobName, ExecutionConfigs(executionFunction, _, _)) => {
         s"${jobName.capitalize}" should "Compute the right Result" in {
           /**
             * Extracting the job configuration
