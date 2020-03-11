@@ -46,7 +46,9 @@ class JsonDfWriter extends DataFrameWriter("json") {
       val elements: Map[String, String] = chain
         .replaceAll("[{}]", "")
         .split(",")
-        .map(e => e.split("\"")(1) -> e).toMap
+        .map(e => {
+          e.split("\"")(1) -> e
+        }).toMap
 
       val nullFilledJson = schema.map(column => {
         elements.get(column) match {

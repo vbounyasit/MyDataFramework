@@ -60,6 +60,11 @@ trait JobsTestGenerator extends TestComponents {
   val defaultApplicationConf: Option[_] = None
 
   /**
+    * An optional application conf file we want to use in our tests.
+    */
+  val defaultJobConf: Option[_] = None
+
+  /**
     * An optional application argument object we want to use in our tests.
     */
   val defaultApplicationArguments: Option[_] = None
@@ -84,8 +89,8 @@ trait JobsTestGenerator extends TestComponents {
     }
 
     //todo change application conf to job conf
-    val optionalApplicationParameters: JobParameters[Any, Any] = JobParameters(defaultApplicationConf, defaultApplicationArguments)
-    val optionalJobParameters: JobParameters[Any, Any] = JobParameters(defaultApplicationConf, defaultJobArguments)
+    val applicationParameters: JobParameters[Any, Any] = JobParameters(defaultApplicationConf, defaultApplicationArguments)
+    val jobParameters: JobParameters[Any, Any] = JobParameters(defaultJobConf, defaultJobArguments)
 
     sparkApplication.executionPlans.foreach {
       case (jobName, ExecutionConfigs(executionFunction, _, _)) => {
@@ -156,7 +161,7 @@ trait JobsTestGenerator extends TestComponents {
           val resultDataFrame = sparkApplication.transform(
             jobName,
             sources,
-            executionFunction(optionalApplicationParameters, optionalJobParameters),
+            executionFunction(applicationParameters, jobParameters),
             Some(jobConf.outputMetadata.outputColumns),
             None
           )

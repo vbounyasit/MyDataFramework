@@ -153,7 +153,7 @@ abstract class SparkApplication[U, V] extends SparkSessionProvider with ETL[U, V
       /**
         * Merging with the list of output tables
         */
-      jobsConfWithOutputMetadata <- CollectionsUtils.mergeByKeyStrict(
+      jobsConfWithOutputMetadata <- CollectionsUtils.mergeMapsByKeyStrict(
         jobsConf,
         tablesToCompute.map(metadata => (metadata.table, metadata)).toMap,
         MergingMapKeyNotFound
@@ -162,7 +162,7 @@ abstract class SparkApplication[U, V] extends SparkSessionProvider with ETL[U, V
       /**
         * Merging with the execution parameters
         */
-      withExecutionParameters <- CollectionsUtils.mergeByKeyStrict(
+      withExecutionParameters <- CollectionsUtils.mergeMapsByKeyStrict(
         jobsConfWithOutputMetadata,
         executionsParameters,
         MergingMapKeyNotFound
