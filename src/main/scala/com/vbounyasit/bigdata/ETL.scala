@@ -19,7 +19,7 @@
 
 package com.vbounyasit.bigdata
 
-import com.vbounyasit.bigdata.ETL.{ExecutionData, JobExecutionParameters, JobParameters, TableMetadata}
+import com.vbounyasit.bigdata.ETL.{ExecutionData, JobExecutionParameters, JobParameters, ParsedParameters, TableMetadata}
 import com.vbounyasit.bigdata.args.ArgumentsConfiguration
 import com.vbounyasit.bigdata.config.ConfigurationsLoader
 import com.vbounyasit.bigdata.config.data.JobsConfig.{JobConf, JobSource}
@@ -42,7 +42,7 @@ trait ETL[U, V] {
     * @param args The list of arguments to parse
     * @return An ExecutionData object containing all the required parameters
     */
-  protected def loadExecutionData(args: Array[String]): ExecutionData[_, _]
+  protected def loadExecutionData(args: Array[String]): ExecutionData
 
   /**
     * Extracts data from a provided sources configuration
@@ -93,10 +93,11 @@ trait ETL[U, V] {
     *
     * @param executionData The ExecutionData object that will be used
     */
-  def runETL[GlobalConfig, GlobalArgument, Config, Argument, ConfigInput, ArgumentInput](executionData: ExecutionData[GlobalConfig, GlobalArgument]): Unit = {
+  def runETL[GlobalConfig, GlobalArgument, Config, Argument, ConfigInput, ArgumentInput](parsedParameters: ParsedParameters[GlobalConfig, GlobalArgument],
+                                                                                         executionData: ExecutionData): Unit = {
     implicit val spark: SparkSession = executionData.spark
 
-    val globalParameters: JobParameters[GlobalConfig, GlobalArgument] = JobParameters(executionData.applicationConf, executionData.applicationArguments)
+    val globalParameters: JobParameters[GlobalConfig, GlobalArgument] = JobParameters(parsedParameters.applicationConf, parsedParameters.applicationArguments)
 
     executionData.jobExecutionParameters
       .foreach(jobParametersExistential => {
@@ -105,7 +106,7 @@ trait ETL[U, V] {
         val sources: Sources = extract(
           jobParameters.outputTable.table,
           jobParameters.jobConf.sources,
-          executionData.configurations.sourcesConf,
+          parsedParameters.configurations.sourcesConf,
           executionData.environment)
 
         //transform
@@ -148,10 +149,11 @@ object ETL {
   type JobParametersPair[GlobalConfig, GlobalArgument, Config, Argument] = (JobParameters[GlobalConfig, GlobalArgument], JobParameters[Config, Argument])
 
 
-  case class ExecutionData[GlobalConfig, GlobalArgument](configurations: ConfigurationsLoader,
-                                                         applicationConf: Option[GlobalConfig],
-                                                         applicationArguments: Option[GlobalArgument],
-                                                         jobExecutionParameters: Seq[JobExecutionParameters[_, _, _, _, _, _]],
+  case class ParsedParameters[GlobalConfig, GlobalArgument](configurations: ConfigurationsLoader,
+                              applicationConf: Option[GlobalConfig],
+                              applicationArguments: Option[GlobalArgument])
+
+  case class ExecutionData(jobExecutionParameters: Seq[JobExecutionParameters[_, _, _, _, _, _]],
                                                          spark: SparkSession,
                                                          environment: String)
 

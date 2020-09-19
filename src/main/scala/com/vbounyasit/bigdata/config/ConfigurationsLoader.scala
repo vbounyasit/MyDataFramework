@@ -61,10 +61,10 @@ object ConfigurationsLoader extends SparkSessionProvider {
       spark <- Right(getSparkSession(sparkParamsConf))
 
       sourcesConf <- {
-        loadConfig[SourcesConf]("Sources conf", configDefinition.sourcesConf(spark))
+        loadConfig[SourcesConf]("Sources conf", configDefinition.sourcesConf)
       }
       jobsConf <- {
-        loadConfig[JobsConf]("Jobs conf", configDefinition.jobsConf(spark))
+        loadConfig[JobsConf]("Jobs conf", configDefinition.jobsConf)
       }
     } yield {
       ConfigurationsLoader(spark, sparkParamsConf, sourcesConf, jobsConf)
