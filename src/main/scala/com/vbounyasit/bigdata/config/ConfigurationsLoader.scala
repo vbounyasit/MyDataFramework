@@ -53,19 +53,16 @@ object ConfigurationsLoader extends SparkSessionProvider {
     */
   def apply(configDefinition: ConfigDefinition, useLocalSparkParams: Boolean = false): Either[ErrorHandler, ConfigurationsLoader] = {
     import pureconfig.generic.auto._
-    for {
+    val x = for {
       sparkParamsConf <- {
-        val conf = if (useLocalSparkParams) configDefinition.sparkLocalConf else configDefinition.sparkConf
-        loadConfig[SparkParamsConf]("Spark conf", conf)
+        val sparkConf = if (useLocalSparkParams) configDefinition.sparkLocalConf else configDefinition.sparkConf
+        loadConfig[SparkParamsConf]("Spark conf", sparkConf)
       }
       spark <- Right(getSparkSession(sparkParamsConf))
 
-      sourcesConf <- {
-        loadConfig[SourcesConf]("Sources conf", configDefinition.sourcesConf)
-      }
-      jobsConf <- {
-        loadConfig[JobsConf]("Jobs conf", configDefinition.jobsConf)
-      }
+      sourcesConf <- loadConfig[SourcesConf]("Sources conf", configDefinition.sourcesConf)
+
+      jobsConf <- loadConfig[JobsConf]("Jobs conf", configDefinition.jobsConf)
     } yield {
       ConfigurationsLoader(spark, sparkParamsConf, sourcesConf, jobsConf)
     }

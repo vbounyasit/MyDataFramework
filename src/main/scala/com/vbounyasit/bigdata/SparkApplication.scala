@@ -110,7 +110,7 @@ abstract class SparkApplication[U, V] extends SparkSessionProvider with ETL[U, V
         * Loading execution parameters
         */
       executionsParameters <- {
-        implicit val spark: SparkSession = getSparkSession(configuration.sparkParamsConf)
+        implicit val spark: SparkSession = configuration.spark
         getMapSubList(tablesToCompute.map(_.table).toList, executionPlans, ExecutionPlanNotFoundError)
       }
 
