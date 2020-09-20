@@ -19,15 +19,15 @@
 
 package com.vbounyasit.bigdata.sample
 
-import com.vbounyasit.bigdata.ETL.OptionalJobParameters
+import com.vbounyasit.bigdata.ETL.JobParametersPair
 import com.vbounyasit.bigdata.EitherRP
 import com.vbounyasit.bigdata.sample.data.{SampleAppConf, SampleArgs}
 import com.vbounyasit.bigdata.sample.joiner.SampleJoiner
 import com.vbounyasit.bigdata.transform.ExecutionPlan
-import com.vbounyasit.bigdata.transform.TransformOps._
+import com.vbounyasit.bigdata.transform.implicits._
 import org.apache.spark.sql.SparkSession
 
-class SampleExecutionPlan(optionalParameters: OptionalJobParameters[SampleAppConf, SampleArgs])(implicit spark: SparkSession) extends ExecutionPlan {
+class SampleExecutionPlan(optionalParameters: JobParametersPair[_, _, SampleAppConf, SampleArgs])(implicit spark: SparkSession) extends ExecutionPlan {
 
   override val executionPipelines: SampleExecutionPipelines = new SampleExecutionPipelines
 

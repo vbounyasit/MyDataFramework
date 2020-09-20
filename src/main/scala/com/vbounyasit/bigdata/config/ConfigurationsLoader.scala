@@ -53,7 +53,7 @@ object ConfigurationsLoader extends SparkSessionProvider {
     */
   def apply(configDefinition: ConfigDefinition, useLocalSparkParams: Boolean = false): Either[ErrorHandler, ConfigurationsLoader] = {
     import pureconfig.generic.auto._
-    val x = for {
+    for {
       sparkParamsConf <- {
         val sparkConf = if (useLocalSparkParams) configDefinition.sparkLocalConf else configDefinition.sparkConf
         loadConfig[SparkParamsConf]("Spark conf", sparkConf)
@@ -83,6 +83,4 @@ object ConfigurationsLoader extends SparkSessionProvider {
       .left
       .map(error => ConfigLoadingError(configName, error))
   }
-
-
 }

@@ -57,7 +57,10 @@ abstract class SparkApplication[U, V] extends SparkSessionProvider with ETL[U, V
       /**
         * Loading configuration files
         */
-      loadedConfigurations <- ConfigurationsLoader(configDefinition)
+      loadedConfigurations <- {
+        val x: Either[ErrorHandler, ConfigurationsLoader] = ConfigurationsLoader(configDefinition)
+        x
+      }
 
       /**
         * Parsing global Application configuration

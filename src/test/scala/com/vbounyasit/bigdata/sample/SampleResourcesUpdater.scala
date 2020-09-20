@@ -26,6 +26,6 @@ object SampleResourcesUpdater extends JsonResourcesUpdater {
   override val sparkApplication: SparkApplication[_, _] = SampleApplication
 
   def main(args: Array[String]): Unit = {
-    run()
+    //run()
   }
 }

@@ -20,7 +20,7 @@
 package com.vbounyasit.bigdata.sample
 
 import com.vbounyasit.bigdata.transform.TransformComponents.ExecutionPipelines
-import com.vbounyasit.bigdata.transform.pipeline.impl.Pipeline
+import com.vbounyasit.bigdata.transform.pipeline.Pipeline
 
 class SampleExecutionPipelines extends ExecutionPipelines {
 
@@ -28,21 +28,21 @@ class SampleExecutionPipelines extends ExecutionPipelines {
 
   import transformers._
 
-  val table1Pipeline1 = Pipeline(
+  val table1Pipeline1: Pipeline = Pipeline(
     FilterOnTable1()
   )
-  val table1Pipeline2 = Pipeline(
+  val table1Pipeline2: Pipeline = Pipeline(
     MultiplyByFactor("col1", 5),
     MultiplyByFactor("col2", 2)
   )
-  val table2Pipeline = Pipeline(
+  val table2Pipeline: Pipeline = Pipeline(
     MultiplyByColumn("col33", "col11"),
     MultiplyByColumn("col33", "col22")
   )
-  val table2AggregationPipeline = Pipeline(
+  val table2AggregationPipeline: Pipeline = Pipeline(
     SumByColumn("index_col", "col33")
   )
-  val postJoinPipeline = Pipeline(
+  val postJoinPipeline: Pipeline = Pipeline(
     MultiplyByColumn("sum_of_col33", "col1"),
     RenameColumn("sum_of_col33", "result"),
     KeepGreaterThan("result", 2000000)

@@ -21,17 +21,14 @@ package com.vbounyasit.bigdata.sample
 
 import com.typesafe.config.{Config, ConfigFactory}
 import com.vbounyasit.bigdata.ApplicationConf
-import com.vbounyasit.bigdata.SparkApplication.ApplicationConfData
 import com.vbounyasit.bigdata.config.ConfigDefinition
 import com.vbounyasit.bigdata.sample.data.SampleAppConf
 
-class SampleConfigDefinition extends ConfigDefinition{
+class SampleConfigDefinition extends ConfigDefinition {
 
   import pureconfig.generic.auto._
 
-  override val applicationConf: ApplicationConf[SampleAppConf] = Some(
-    ApplicationConfData("application", pureconfig.loadConfig[SampleAppConf])
-  )
+  override val applicationConf: ApplicationConf[SampleAppConf] = loadConfig("application", ConfigFactory.load())
 
   override val sourcesConf: Config = ConfigFactory.load("sources")
 

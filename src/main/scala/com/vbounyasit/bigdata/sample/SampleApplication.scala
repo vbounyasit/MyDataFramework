@@ -19,7 +19,7 @@
 
 package com.vbounyasit.bigdata.sample
 
-import com.vbounyasit.bigdata.ETL.{ExecutionParameters, OptionalJobParameters}
+import com.vbounyasit.bigdata.ETL.{ExecutionConfigs, JobParameters, JobParametersPair, TableMetadata}
 import com.vbounyasit.bigdata.SparkApplication
 import com.vbounyasit.bigdata.config.ConfigDefinition
 import com.vbounyasit.bigdata.sample.data.{SampleAppConf, SampleArgs}
@@ -29,22 +29,21 @@ object SampleApplication extends SparkApplication[SampleAppConf, SampleArgs] {
 
   override val configDefinition: ConfigDefinition = new SampleConfigDefinition
 
-  override def executionPlans(implicit spark: SparkSession): Map[String, ExecutionParameters[SampleAppConf, SampleArgs]] = Map(
-    "job1" -> ExecutionParameters[SampleAppConf, SampleArgs](
+  override def executionPlans(implicit spark: SparkSession): Map[String, ExecutionConfigs[_, _, SampleAppConf, SampleArgs]] = Map(
+    "job1" -> ExecutionConfigs[SampleAppConf, SampleArgs, SampleAppConf, SampleArgs](
       params => new SampleExecutionPlan(params),
-      Some(new SampleArgumentConf)
+      additionalArguments = Some(new SampleArgumentConf)
     )
   )
 
   override def load(dataFrame: DataFrame,
-                    database: String,
-                    table: String,
-                    optionalJobParameters: OptionalJobParameters[SampleAppConf, SampleArgs]): Unit = {
+                    outputTable: TableMetadata,
+                    optionalJobParameters: JobParameters[SampleAppConf, SampleArgs]): Unit = {
     dataFrame.show()
   }
 
   def main(args: Array[String]): Unit = {
-    val executionData = loadExecutionData(args)
-    runETL(executionData)
+    //val executionData = loadExecutionData(args)
+    //runETL(executionData)
   }
 }

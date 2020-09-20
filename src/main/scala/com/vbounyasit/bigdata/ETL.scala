@@ -42,7 +42,10 @@ trait ETL[U, V] {
     * @param args The list of arguments to parse
     * @return An ExecutionData object containing all the required parameters
     */
-  protected def loadExecutionData(args: Array[String]): ExecutionData
+  protected def loadExecutionData(configuration: ConfigurationsLoader,
+                                  tablesToCompute: Seq[TableMetadata],
+                                  environment: String,
+                                  args: Array[String]): ExecutionData
 
   /**
     * Extracts data from a provided sources configuration
