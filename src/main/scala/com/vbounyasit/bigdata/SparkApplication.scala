@@ -22,6 +22,7 @@ package com.vbounyasit.bigdata
 import cats.implicits._
 import com.vbounyasit.bigdata.ETL._
 import com.vbounyasit.bigdata.appImplicits._
+import com.vbounyasit.bigdata.config.ConfigurationsLoader.loadConfig
 import com.vbounyasit.bigdata.config.data.JobsConfig.JobSource
 import com.vbounyasit.bigdata.config.data.SourcesConfig.SourcesConf
 import com.vbounyasit.bigdata.config.{ConfigDefinition, ConfigsExtractor, ConfigurationsLoader}
@@ -57,15 +58,12 @@ abstract class SparkApplication[U, V] extends SparkSessionProvider with ETL[U, V
       /**
         * Loading configuration files
         */
-      loadedConfigurations <- {
-        val x: Either[ErrorHandler, ConfigurationsLoader] = ConfigurationsLoader(configDefinition)
-        x
-      }
+      loadedConfigurations <- ConfigurationsLoader(configDefinition)
 
       /**
         * Parsing global Application configuration
         */
-      parsedApplicationConfiguration <- toEitherOfOptional(configDefinition.applicationConf)
+      parsedApplicationConfiguration <- toEitherOfOptional(configDefinition.applicationConf.map(_.loadedConfig))
 
       /**
         * Parsing global Application argument parameters
@@ -101,9 +99,7 @@ abstract class SparkApplication[U, V] extends SparkSessionProvider with ETL[U, V
                                   tablesToCompute: Seq[TableMetadata],
                                   environment: String,
                                   args: Array[String]): ExecutionData = {
-
     (for {
-
       /**
         * Loading jobs conf
         */
@@ -135,12 +131,10 @@ abstract class SparkApplication[U, V] extends SparkSessionProvider with ETL[U, V
         MergingMapKeyNotFound
       )
 
-
       /**
         * Parsing the job arguments and configurations
         */
       jobFullExecutionParameters <- {
-
         withExecutionParameters
           .values
           .map {

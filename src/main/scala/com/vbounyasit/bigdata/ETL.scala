@@ -34,6 +34,8 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
   */
 trait ETL[U, V] {
 
+  protected def parseApplicationParameters(args: Array[String]): ParsedParameters[_, _]
+
   /**
     * Loads a set of parameters needed for the ETL Operation
     *
@@ -82,7 +84,7 @@ trait ETL[U, V] {
     * Saves the resulting dataFrame to disk
     *
     * @param dataFrame             The resulting DataFrame
-    * @param outputTable          The output database and table
+    * @param outputTable           The output database and table
     * @param optionalJobParameters An OptionalJobParameters object containing any custom
     *                              argument/application files we defined through our application.
     */
@@ -153,12 +155,12 @@ object ETL {
 
 
   case class ParsedParameters[GlobalConfig, GlobalArgument](configurations: ConfigurationsLoader,
-                              applicationConf: Option[GlobalConfig],
-                              applicationArguments: Option[GlobalArgument])
+                                                            applicationConf: Option[GlobalConfig],
+                                                            applicationArguments: Option[GlobalArgument])
 
   case class ExecutionData(jobExecutionParameters: Seq[JobExecutionParameters[_, _, _, _, _, _]],
-                                                         spark: SparkSession,
-                                                         environment: String)
+                           spark: SparkSession,
+                           environment: String)
 
   case class JobExecutionParameters[GlobalConfigInput, GlobalArgumentInput, Config, Argument, ConfigInput, ArgumentInput](jobConf: JobConf,
                                                                                                                           outputTable: TableMetadata,
@@ -166,6 +168,7 @@ object ETL {
                                                                                                                           executionFunction: JobParametersPair[GlobalConfigInput, GlobalArgumentInput, ConfigInput, ArgumentInput] => ExecutionPlan)
 
   case class TableMetadata(database: String, table: String)
+
   case class JobParameters[Config, Argument](applicationConfig: Option[Config],
                                              arguments: Option[Argument])
 
@@ -179,4 +182,5 @@ object ETL {
     def apply[GlobalConfig, GlobalArgument, Config, Argument](executionPlan: ExecutionPlan): ExecutionConfigs[GlobalConfig, GlobalArgument, Config, Argument] =
       ExecutionConfigs(_ => executionPlan)
   }
+
 }

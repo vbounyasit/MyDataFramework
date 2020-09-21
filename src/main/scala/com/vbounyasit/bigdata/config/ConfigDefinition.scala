@@ -20,18 +20,12 @@
 package com.vbounyasit.bigdata.config
 
 import com.typesafe.config.{Config, ConfigFactory}
-import com.vbounyasit.bigdata.ApplicationConf
 import com.vbounyasit.bigdata.args.ArgumentsConfiguration
-import pureconfig.ConfigReader
 
 /**
   * Everything related to configuration files loading is handled here.
   */
 trait ConfigDefinition {
-
-  def loadConfig[T](configName: String, config: Config)(implicit reader: ConfigReader[T]): ApplicationConf[T] = {
-    Some(ConfigurationsLoader.loadConfig[T](configName, config))
-  }
 
   /**
     * The spark parameters that will be used on the remote cluster we submit our job on.
@@ -59,7 +53,7 @@ trait ConfigDefinition {
     * Note: On the Application side, you can fill this parameter using the
     * loadConfig function from pureconfig
     */
-  val applicationConf: ApplicationConf[_] = None
+  val applicationConf: Option[CustomConfig[_]] = None
 
   /**
     * The arguments parameters that will be parsed for every jobs launched

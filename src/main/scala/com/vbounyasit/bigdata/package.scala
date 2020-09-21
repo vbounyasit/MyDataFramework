@@ -30,7 +30,6 @@ package object bigdata {
   type Sources = Map[String, SourcePipeline]
   type ExecutionPlans = Map[String, ExecutionPlan]
   type EitherRP = Either[ErrorHandler, SourcePipeline]
-  type ApplicationConf[T] = Option[Either[ErrorHandler, T]]
   type PureConfigLoaded[T] = Either[ConfigReaderFailures, T]
   type ExceptionWithMessage[T <: ErrorHandler] = String => T
   type OutputTables = Option[Seq[TableMetadata]]
