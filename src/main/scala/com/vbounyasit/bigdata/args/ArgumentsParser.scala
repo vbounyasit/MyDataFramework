@@ -49,7 +49,7 @@ class ArgumentsParser[T](name: String,
     val parserSequence = argsConfig.map {
       case (key, value) =>
         val parsing: OParser[String, T] =
-          opt[String](name = key) action value.argumentMapping text value.description
+          opt[String](name = key) action value.argConstructor text value.description
         if (value.paramValidation.isEmpty)
           parsing
         else

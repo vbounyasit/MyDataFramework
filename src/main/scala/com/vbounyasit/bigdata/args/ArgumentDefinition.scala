@@ -24,7 +24,7 @@ import com.vbounyasit.bigdata.args.ArgumentDefinition.ParamValidation
 /**
   * A definition for each arguments provided in the command line while submitting the Spark job
   *
-  * @param argumentMapping A function of that will construct the argument case class that will be used
+  * @param argConstructor A function of that will construct the argument case class that will be used
   *                        in your job.
   *                        NB: (arg, Arguments object) => Arguments object
   * @param description     The description of the argument parameter
@@ -32,7 +32,7 @@ import com.vbounyasit.bigdata.args.ArgumentDefinition.ParamValidation
   * @tparam T The Arguments object
   */
 case class ArgumentDefinition[T](description: String,
-                                 argumentMapping: (String, T) => T,
+                                 argConstructor: (String, T) => T,
                                  paramValidation: Option[ParamValidation] = None)
 
 object ArgumentDefinition {

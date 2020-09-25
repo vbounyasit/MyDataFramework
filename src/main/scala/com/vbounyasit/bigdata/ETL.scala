@@ -19,7 +19,7 @@
 
 package com.vbounyasit.bigdata
 
-import com.vbounyasit.bigdata.ETL.{ExecutionData, JobExecutionParameters, JobParameters, ParsedParameters, TableMetadata}
+import com.vbounyasit.bigdata.ETL.{ExecutionData, JobExecutionParameters, JobParameter, JobParameters, ParsedParameters, TableMetadata}
 import com.vbounyasit.bigdata.args.ArgumentsConfiguration
 import com.vbounyasit.bigdata.config.ConfigurationsLoader
 import com.vbounyasit.bigdata.config.data.JobsConfig.{JobConf, JobSource}
@@ -90,7 +90,7 @@ trait ETL[U, V] {
     */
   def load(dataFrame: DataFrame,
            outputTable: TableMetadata,
-           optionalJobParameters: JobParameters[U, V]): Unit
+           optionalJobParameters: JobParameter[U, V]): Unit
 
 
   /**
@@ -102,7 +102,7 @@ trait ETL[U, V] {
                                                                                          executionData: ExecutionData): Unit = {
     implicit val spark: SparkSession = executionData.spark
 
-    val globalParameters: JobParameters[GlobalConfig, GlobalArgument] = JobParameters(parsedParameters.applicationConf, parsedParameters.applicationArguments)
+    val globalParameters: JobParameter[GlobalConfig, GlobalArgument] = JobParameter(parsedParameters.applicationConf, parsedParameters.applicationArguments)
 
     executionData.jobExecutionParameters
       .foreach(jobParametersExistential => {
@@ -120,12 +120,14 @@ trait ETL[U, V] {
           sources,
           jobParameters.executionFunction(
             JobParameters(
-              globalParameters.applicationConfig,
-              globalParameters.arguments
-            ),
-            JobParameters(
-              jobParameters.jobParameters.applicationConfig.map(_.asInstanceOf[ConfigInput]),
-              jobParameters.jobParameters.arguments.map(_.asInstanceOf[ArgumentInput])
+              JobParameter(
+                globalParameters.applicationConfig,
+                globalParameters.arguments
+              ),
+              JobParameter(
+                jobParameters.jobParameters.applicationConfig.map(_.asInstanceOf[ConfigInput]),
+                jobParameters.jobParameters.arguments.map(_.asInstanceOf[ArgumentInput])
+              )
             )
           ),
           Some(jobParameters.jobConf.outputMetadata.outputColumns),
@@ -136,7 +138,7 @@ trait ETL[U, V] {
         load(
           resultDataFrame,
           jobParameters.outputTable,
-          globalParameters.asInstanceOf[JobParameters[U, V]]
+          globalParameters.asInstanceOf[JobParameter[U, V]]
         )
       })
   }
@@ -149,10 +151,7 @@ object ETL {
 
   type ExecutionConfig = ExecutionConfigs[_, _, _, _]
 
-  type EmptyJobParameters = JobParameters[Nothing, Nothing]
-
-  type JobParametersPair[GlobalConfig, GlobalArgument, Config, Argument] = (JobParameters[GlobalConfig, GlobalArgument], JobParameters[Config, Argument])
-
+  type EmptyJobParameters = JobParameter[Nothing, Nothing]
 
   case class ParsedParameters[GlobalConfig, GlobalArgument](configurations: ConfigurationsLoader,
                                                             applicationConf: Option[GlobalConfig],
@@ -164,16 +163,19 @@ object ETL {
 
   case class JobExecutionParameters[GlobalConfigInput, GlobalArgumentInput, Config, Argument, ConfigInput, ArgumentInput](jobConf: JobConf,
                                                                                                                           outputTable: TableMetadata,
-                                                                                                                          jobParameters: JobParameters[Config, Argument],
-                                                                                                                          executionFunction: JobParametersPair[GlobalConfigInput, GlobalArgumentInput, ConfigInput, ArgumentInput] => ExecutionPlan)
+                                                                                                                          jobParameters: JobParameter[Config, Argument],
+                                                                                                                          executionFunction: JobParameters[GlobalConfigInput, GlobalArgumentInput, ConfigInput, ArgumentInput] => ExecutionPlan)
 
   case class TableMetadata(database: String, table: String)
 
-  case class JobParameters[Config, Argument](applicationConfig: Option[Config],
-                                             arguments: Option[Argument])
+  case class JobParameter[Config, Argument](applicationConfig: Option[Config],
+                                            arguments: Option[Argument])
+
+  case class JobParameters[GlobalConfig, GlobalArgument, Config, Argument](globalParameter: JobParameter[GlobalConfig, GlobalArgument],
+                                                                           jobSpecificParameter: JobParameter[Config, Argument])
 
 
-  case class ExecutionConfigs[GlobalConfig, GlobalArgument, Config, Argument](executionFunction: JobParametersPair[GlobalConfig, GlobalArgument, Config, Argument] => ExecutionPlan,
+  case class ExecutionConfigs[GlobalConfig, GlobalArgument, Config, Argument](executionFunction: JobParameters[GlobalConfig, GlobalArgument, Config, Argument] => ExecutionPlan,
                                                                               additionalConfig: Option[Either[ErrorHandler, Config]] = None,
                                                                               additionalArguments: Option[ArgumentsConfiguration[Argument]] = None)
 

@@ -153,7 +153,7 @@ abstract class SparkApplication[U, V] extends SparkSessionProvider with ETL[U, V
                 JobExecutionParameters(
                   jobConf,
                   tableMetadata,
-                  JobParameters(jobConfig, jobArguments),
+                  JobParameter(jobConfig, jobArguments),
                   executionConfig.executionFunction
                 )
           }.toList.sequence
