@@ -48,8 +48,10 @@ class ArgumentsParser[T](name: String,
   def buildArguments(argsConfig: Map[String, ArgumentDefinition[T]]): OParser[_, T] = {
     val parserSequence = argsConfig.map {
       case (key, value) =>
-        val parsing: OParser[String, T] =
+        var parsing: OParser[String, T] =
           opt[String](name = key) action value.argConstructor text value.description
+        if(value.isRequired) parsing = parsing required
+
         if (value.paramValidation.isEmpty)
           parsing
         else

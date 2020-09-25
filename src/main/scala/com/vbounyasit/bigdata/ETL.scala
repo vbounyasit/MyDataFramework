@@ -106,7 +106,7 @@ trait ETL[U, V] {
 
     executionData.jobExecutionParameters
       .foreach(jobParametersExistential => {
-        val jobParameters = jobParametersExistential.asInstanceOf[JobExecutionParameters[GlobalConfig, GlobalArgument, Config, Argument, ConfigInput, ArgumentInput]]
+        val jobParameters = jobParametersExistential.asInstanceOf[JobExecutionParameters[Config, Argument, ConfigInput, ArgumentInput]]
         //extract
         val sources: Sources = extract(
           jobParameters.outputTable.table,
@@ -119,15 +119,9 @@ trait ETL[U, V] {
           jobParameters.outputTable.table,
           sources,
           jobParameters.executionFunction(
-            JobParameters(
-              JobParameter(
-                globalParameters.applicationConfig,
-                globalParameters.arguments
-              ),
-              JobParameter(
-                jobParameters.jobParameters.applicationConfig.map(_.asInstanceOf[ConfigInput]),
-                jobParameters.jobParameters.arguments.map(_.asInstanceOf[ArgumentInput])
-              )
+            JobParameter(
+              jobParameters.jobParameters.applicationConfig.map(_.asInstanceOf[ConfigInput]),
+              jobParameters.jobParameters.arguments.map(_.asInstanceOf[ArgumentInput])
             )
           ),
           Some(jobParameters.jobConf.outputMetadata.outputColumns),
@@ -149,7 +143,7 @@ trait ETL[U, V] {
   */
 object ETL {
 
-  type ExecutionConfig = ExecutionConfigs[_, _, _, _]
+  type ExecutionConfig = ExecutionConfigs[_, _]
 
   type EmptyJobParameters = JobParameter[Nothing, Nothing]
 
@@ -157,14 +151,14 @@ object ETL {
                                                             applicationConf: Option[GlobalConfig],
                                                             applicationArguments: Option[GlobalArgument])
 
-  case class ExecutionData(jobExecutionParameters: Seq[JobExecutionParameters[_, _, _, _, _, _]],
+  case class ExecutionData(jobExecutionParameters: Seq[JobExecutionParameters[_, _, _, _]],
                            spark: SparkSession,
                            environment: String)
 
-  case class JobExecutionParameters[GlobalConfigInput, GlobalArgumentInput, Config, Argument, ConfigInput, ArgumentInput](jobConf: JobConf,
-                                                                                                                          outputTable: TableMetadata,
-                                                                                                                          jobParameters: JobParameter[Config, Argument],
-                                                                                                                          executionFunction: JobParameters[GlobalConfigInput, GlobalArgumentInput, ConfigInput, ArgumentInput] => ExecutionPlan)
+  case class JobExecutionParameters[Config, Argument, ConfigInput, ArgumentInput](jobConf: JobConf,
+                                                                                  outputTable: TableMetadata,
+                                                                                  jobParameters: JobParameter[Config, Argument],
+                                                                                  executionFunction: JobParameter[ConfigInput, ArgumentInput] => ExecutionPlan)
 
   case class TableMetadata(database: String, table: String)
 
@@ -175,13 +169,13 @@ object ETL {
                                                                            jobSpecificParameter: JobParameter[Config, Argument])
 
 
-  case class ExecutionConfigs[GlobalConfig, GlobalArgument, Config, Argument](executionFunction: JobParameters[GlobalConfig, GlobalArgument, Config, Argument] => ExecutionPlan,
-                                                                              additionalConfig: Option[Either[ErrorHandler, Config]] = None,
-                                                                              additionalArguments: Option[ArgumentsConfiguration[Argument]] = None)
+  case class ExecutionConfigs[Config, Argument](executionFunction: JobParameter[Config, Argument] => ExecutionPlan,
+                                                additionalConfig: Option[Either[ErrorHandler, Config]] = None,
+                                                additionalArguments: Option[ArgumentsConfiguration[Argument]] = None)
 
 
   object ExecutionConfigs {
-    def apply[GlobalConfig, GlobalArgument, Config, Argument](executionPlan: ExecutionPlan): ExecutionConfigs[GlobalConfig, GlobalArgument, Config, Argument] =
+    def apply[Config, Argument](executionPlan: ExecutionPlan): ExecutionConfigs[Config, Argument] =
       ExecutionConfigs(_ => executionPlan)
   }
 

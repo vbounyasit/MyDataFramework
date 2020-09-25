@@ -161,7 +161,7 @@ trait JobsTestGenerator extends TestComponents {
           val resultDataFrame = sparkApplication.transform(
             jobName,
             sources,
-            executionFunction(JobParameters(applicationParameters, jobParameters)),
+            executionFunction(jobParameters),
             Some(jobConf.outputMetadata.outputColumns),
             None
           )

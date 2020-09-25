@@ -33,7 +33,8 @@ import com.vbounyasit.bigdata.args.ArgumentDefinition.ParamValidation
   */
 case class ArgumentDefinition[T](description: String,
                                  argConstructor: (String, T) => T,
-                                 paramValidation: Option[ParamValidation] = None)
+                                 paramValidation: Option[ParamValidation] = None,
+                                 isRequired: Boolean = false)
 
 object ArgumentDefinition {
 
