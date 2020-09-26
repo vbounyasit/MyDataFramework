@@ -19,7 +19,7 @@
 
 package com.vbounyasit.bigdata.testing
 
-import com.vbounyasit.bigdata.ETL.{ExecutionConfigs, JobParameter, JobParameters}
+import com.vbounyasit.bigdata.ETL.{ExecutionConfigs, InputParameters, ParametersPair}
 import com.vbounyasit.bigdata.appImplicits._
 import com.vbounyasit.bigdata.config.data.JobsConfig.JobConf
 import com.vbounyasit.bigdata.config.{ConfigsExtractor, ConfigurationsLoader}
@@ -41,7 +41,7 @@ trait JobsTestGenerator extends TestComponents {
   /**
     * The application to generate tests for.
     */
-  val sparkApplication: SparkApplication[_, _]
+  val sparkApplication: SparkApplication
 
   /**
     * The hive environment object used.
@@ -89,8 +89,9 @@ trait JobsTestGenerator extends TestComponents {
     }
 
     //todo change application conf to job conf
-    val applicationParameters: JobParameter[Any, Any] = JobParameter(defaultApplicationConf, defaultApplicationArguments)
-    val jobParameters: JobParameter[Any, Any] = JobParameter(defaultJobConf, defaultJobArguments)
+    val applicationParameters: ParametersPair[Any, Any] = ParametersPair(defaultApplicationConf, defaultApplicationArguments)
+    val jobParameters: ParametersPair[Any, Any] = ParametersPair(defaultJobConf, defaultJobArguments)
+    val parameters: InputParameters[Any, Any, Any, Any] = InputParameters(applicationParameters, jobParameters)
 
     sparkApplication.executionPlans.foreach {
       case (jobName, ExecutionConfigs(executionFunction, _, _)) => {
@@ -161,7 +162,7 @@ trait JobsTestGenerator extends TestComponents {
           val resultDataFrame = sparkApplication.transform(
             jobName,
             sources,
-            executionFunction(jobParameters),
+            executionFunction(parameters),
             Some(jobConf.outputMetadata.outputColumns),
             None
           )

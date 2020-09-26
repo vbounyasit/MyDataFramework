@@ -19,8 +19,6 @@
 
 package com.vbounyasit.bigdata.args
 
-import com.vbounyasit.bigdata.args.ArgumentDefinition.ParamValidation
-
 /**
   * A trait that contains all the defined configurations for command line argument parsing
  *

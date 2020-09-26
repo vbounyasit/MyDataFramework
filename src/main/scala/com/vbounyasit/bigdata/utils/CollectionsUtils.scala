@@ -19,9 +19,9 @@
 
 package com.vbounyasit.bigdata.utils
 
+import cats.implicits._
 import com.vbounyasit.bigdata.ExceptionWithMessage
 import com.vbounyasit.bigdata.exceptions.ErrorHandler.MergingMapKeyNotFound
-import cats.implicits._
 
 import scala.reflect.{ClassTag, classTag}
 

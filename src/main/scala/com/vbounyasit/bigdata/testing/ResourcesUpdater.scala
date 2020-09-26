@@ -24,7 +24,7 @@ import java.io.File
 import cats.data.Validated
 import cats.implicits._
 import com.vbounyasit.bigdata.SparkApplication
-import com.vbounyasit.bigdata.config.data.JobsConfig.{JobSource, OutputMetaData}
+import com.vbounyasit.bigdata.config.data.JobsConfig.JobSource
 import com.vbounyasit.bigdata.config.{ConfigsExtractor, ConfigurationsLoader}
 import com.vbounyasit.bigdata.exceptions.ErrorHandler.{JobSourcesNotFoundError, ReadDataFramesFromFilesError}
 import com.vbounyasit.bigdata.implicits._
@@ -47,7 +47,7 @@ abstract class ResourcesUpdater extends SparkSessionProvider with LoggerProvider
   /**
     * The spark application to generate files for
     */
-  val sparkApplication: SparkApplication[_, _]
+  val sparkApplication: SparkApplication
 
   /**
     * Our DataFrame loader and writer instances

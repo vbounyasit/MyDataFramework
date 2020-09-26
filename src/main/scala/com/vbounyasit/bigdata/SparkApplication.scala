@@ -22,7 +22,6 @@ package com.vbounyasit.bigdata
 import cats.implicits._
 import com.vbounyasit.bigdata.ETL._
 import com.vbounyasit.bigdata.appImplicits._
-import com.vbounyasit.bigdata.config.ConfigurationsLoader.loadConfig
 import com.vbounyasit.bigdata.config.data.JobsConfig.JobSource
 import com.vbounyasit.bigdata.config.data.SourcesConfig.SourcesConf
 import com.vbounyasit.bigdata.config.{ConfigDefinition, ConfigsExtractor, ConfigurationsLoader}
@@ -38,7 +37,7 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
 /**
   * A class representing a submitted Spark application.
   */
-abstract class SparkApplication[U, V] extends SparkSessionProvider with ETL[U, V] with LoggerProvider {
+abstract class SparkApplication extends SparkSessionProvider with ETL with LoggerProvider {
 
   /**
     * The configuration files definition
@@ -139,7 +138,7 @@ abstract class SparkApplication[U, V] extends SparkSessionProvider with ETL[U, V
           .values
           .map {
             case ((jobConf, tableMetadata), executionConfig) =>
-              val parsedJobConfiguration: Either[ErrorHandler, Option[_]] = toEitherOfOptional(executionConfig.additionalConfig)
+              val parsedJobConfiguration: Either[ErrorHandler, Option[_]] = toEitherOfOptional(executionConfig.additionalConfig.map(_.loadedConfig))
               val parsedJobArguments: Either[ErrorHandler, Option[_]] = toEitherOfOptional(executionConfig.additionalArguments.map(argsConf => {
                 argsConf.argumentParser.parseArguments(
                   configuration.sparkParamsConf.appName,
@@ -153,7 +152,7 @@ abstract class SparkApplication[U, V] extends SparkSessionProvider with ETL[U, V
                 JobExecutionParameters(
                   jobConf,
                   tableMetadata,
-                  JobParameter(jobConfig, jobArguments),
+                  ParametersPair(jobConfig, jobArguments),
                   executionConfig.executionFunction
                 )
           }.toList.sequence
