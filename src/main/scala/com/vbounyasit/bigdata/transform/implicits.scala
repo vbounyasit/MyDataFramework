@@ -23,7 +23,6 @@ import cats.implicits._
 import com.vbounyasit.bigdata.EitherRP
 import com.vbounyasit.bigdata.transform.joiner.Joiner
 import com.vbounyasit.bigdata.transform.pipeline.{Pipeline, SourcePipeline}
-import com.vbounyasit.bigdata.transform.pipeline.Pipeline
 import org.apache.spark.sql.DataFrame
 
 /**
@@ -43,7 +42,7 @@ trait implicits[U] {
   */
 object implicits {
 
-  //todo maybe turn the whole transformation theory with scala cats
+  //TODO maybe turn the whole transformation theory with scala cats
 
   implicit class PipelineOperator[U](value: U) {
     def ==>[V, W](target: V)(implicit appender: (U, V) => W): W = {

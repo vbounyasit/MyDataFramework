@@ -19,7 +19,7 @@
 
 package com.vbounyasit.bigdata.testing
 
-import com.vbounyasit.bigdata.ETL.{ExecutionConfigs, JobParameters}
+import com.vbounyasit.bigdata.ETL.{ExecutionConfigs, InputParameters, ParametersPair}
 import com.vbounyasit.bigdata.appImplicits._
 import com.vbounyasit.bigdata.config.data.JobsConfig.JobConf
 import com.vbounyasit.bigdata.config.{ConfigsExtractor, ConfigurationsLoader}
@@ -41,7 +41,7 @@ trait JobsTestGenerator extends TestComponents {
   /**
     * The application to generate tests for.
     */
-  val sparkApplication: SparkApplication[_, _]
+  val sparkApplication: SparkApplication
 
   /**
     * The hive environment object used.
@@ -58,6 +58,11 @@ trait JobsTestGenerator extends TestComponents {
     * An optional application conf file we want to use in our tests.
     */
   val defaultApplicationConf: Option[_] = None
+
+  /**
+    * An optional application conf file we want to use in our tests.
+    */
+  val defaultJobConf: Option[_] = None
 
   /**
     * An optional application argument object we want to use in our tests.
@@ -84,8 +89,9 @@ trait JobsTestGenerator extends TestComponents {
     }
 
     //todo change application conf to job conf
-    val optionalApplicationParameters: JobParameters[Any, Any] = JobParameters(defaultApplicationConf, defaultApplicationArguments)
-    val optionalJobParameters: JobParameters[Any, Any] = JobParameters(defaultApplicationConf, defaultJobArguments)
+    val applicationParameters: ParametersPair[Any, Any] = ParametersPair(defaultApplicationConf, defaultApplicationArguments)
+    val jobParameters: ParametersPair[Any, Any] = ParametersPair(defaultJobConf, defaultJobArguments)
+    val parameters: InputParameters[Any, Any, Any, Any] = InputParameters(applicationParameters, jobParameters)
 
     sparkApplication.executionPlans.foreach {
       case (jobName, ExecutionConfigs(executionFunction, _, _)) => {
@@ -156,7 +162,7 @@ trait JobsTestGenerator extends TestComponents {
           val resultDataFrame = sparkApplication.transform(
             jobName,
             sources,
-            executionFunction(optionalApplicationParameters, optionalJobParameters),
+            executionFunction(parameters),
             Some(jobConf.outputMetadata.outputColumns),
             None
           )

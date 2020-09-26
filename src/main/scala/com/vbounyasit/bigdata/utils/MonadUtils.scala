@@ -47,4 +47,10 @@ object MonadUtils {
       .map(e => toEither(e._1, e._2))
       .sequence.map(_.toMap)
   }
+
+  def toEitherOfOptional[U](value: Option[Either[ErrorHandler, U]]): Either[ErrorHandler, Option[U]] =
+    value match {
+      case Some(either) => either.right.map(Some.apply)
+      case None => Right(None)
+    }
 }

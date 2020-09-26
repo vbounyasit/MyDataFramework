@@ -47,7 +47,7 @@ abstract class ResourcesUpdater extends SparkSessionProvider with LoggerProvider
   /**
     * The spark application to generate files for
     */
-  val sparkApplication: SparkApplication[_, _]
+  val sparkApplication: SparkApplication
 
   /**
     * Our DataFrame loader and writer instances
@@ -55,6 +55,32 @@ abstract class ResourcesUpdater extends SparkSessionProvider with LoggerProvider
   val dataFrameLoader: DataFrameLoader
 
   val dataFrameWriter: DataFrameWriter
+
+  //todo factorize this process since its also used in the next function
+  def updateJobOutputs(outputJobsInfo: Seq[(JobTableMetadata, Seq[String])])(implicit spark: SparkSession): Seq[History] = {
+    outputJobsInfo.map{
+      case (outputJobTableMetadata, outputColumns) => {
+        val loadedDataFrameInfo = dataFrameLoader.loadDataFrames(Seq(outputJobTableMetadata), "out")
+
+        val (dataFrameToCreate, logHistory): (DataFrame, History) = loadedDataFrameInfo match {
+          case Seq(Right((_, dataFrame))) => {
+            val newColumns = outputColumns.toSet.diff(dataFrame.columns.toSet)
+            val removedColumns = dataFrame.columns.toSet.diff(outputColumns.toSet)
+            val transformationsToApply: Seq[DataFrame => DataFrame] =
+              newColumns.map(column => (df: DataFrame) => df.withColumn(column, lit(defaultColumnValue))).toSeq ++
+                removedColumns.map(column => (df: DataFrame) => df.drop(column)).toSeq
+            val resultDataFrame = transformationsToApply.foldLeft(dataFrame)((acc, f) => f(acc))
+              .select(outputColumns.map(col): _*)
+            (resultDataFrame, History("Output DataFrame Updated", outputJobTableMetadata.jobName))
+          }
+          case _ => (createDefaultDataFrameFromConfigs(outputColumns), History("Output DataFrame Created", outputJobTableMetadata.jobName))
+        }
+        dataFrameWriter.writeDataFrameToResources(outputJobTableMetadata.jobName, outputJobTableMetadata.database, outputJobTableMetadata.table, "out", dataFrameToCreate)
+
+        logHistory
+      }
+    }
+  }
 
   /**
     * Writing or updating source files in Resources folder
@@ -92,7 +118,7 @@ abstract class ResourcesUpdater extends SparkSessionProvider with LoggerProvider
             val logContent = newColsMessage |+| colsRemovedMessage
 
             (newDataFrame, logContent.getOrElse(none))
-          case None => (createDefaultDataFrameFromConfigs(jobSource), s"Source created.")
+          case None => (createDefaultDataFrameFromConfigs(jobSource.selectedColumns), s"Source created.")
         }
         (jobSourceInfo, dataFrameToWrite.select(jobSource.selectedColumns.map(col): _*), History(s"Sources Updates for [${jobSourceInfo.jobName}] ${jobSource.sourceName}", historyContent))
     }
@@ -137,9 +163,15 @@ abstract class ResourcesUpdater extends SparkSessionProvider with LoggerProvider
           }
         })
     }.toList
+    val outputResourcesToUpdate: Seq[(JobTableMetadata, Seq[String])] = loadedConfigurations.jobsConf.jobs.map{
+      case (jobName, jobConf) =>
+        (JobTableMetadata(jobName, "job_results", jobName), jobConf.outputMetadata.outputColumns)
+    }.toSeq
     val validatedSourcesToUpdate: Validated[JobSourcesNotFoundError, List[(JobTableMetadata, JobSource)]] = sourcesToUpdate.sequence
     val updateSourcesHistory: Seq[History] =
-      updateSources(validatedSourcesToUpdate.toEither)
+      (updateSources(validatedSourcesToUpdate.toEither) ++
+        updateJobOutputs(outputResourcesToUpdate)
+        )
         .filter(!_.content.contains(none)) match {
         case Nil => Seq(History("History", "No updates so far"))
         case histories => histories
@@ -150,13 +182,13 @@ abstract class ResourcesUpdater extends SparkSessionProvider with LoggerProvider
   /**
     * Creates a default DataFrame based on the job source data
     *
-    * @param source the source to create a dataFrame from
-    * @param spark  the implicit spark session
+    * @param columns the list of columns to use
+    * @param spark   the implicit spark session
     * @return a DataFrame containing default rows and the right schema
     */
-  def createDefaultDataFrameFromConfigs(source: JobSource)(implicit spark: SparkSession): DataFrame = {
-    val schema: StructType = StructType(source.selectedColumns.map(column => StructField(column, defaultColumnType)))
-    val defaultRow = Row(List.fill(source.selectedColumns.length)(defaultColumnValue): _*)
+  def createDefaultDataFrameFromConfigs(columns: Seq[String])(implicit spark: SparkSession): DataFrame = {
+    val schema: StructType = StructType(columns.map(column => StructField(column, defaultColumnType)))
+    val defaultRow = Row(List.fill(columns.length)(defaultColumnValue): _*)
     val rdd: RDD[Row] = spark.sparkContext.parallelize(List.fill(defaultSourceRowCount)(defaultRow))
     spark.createDataFrame(rdd, schema)
   }

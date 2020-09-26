@@ -21,27 +21,11 @@ package com.vbounyasit.bigdata.config
 
 import com.typesafe.config.{Config, ConfigFactory}
 import com.vbounyasit.bigdata.args.ArgumentsConfiguration
-import com.vbounyasit.bigdata.config.OutputTablesGenerator.ResultTables
-import com.vbounyasit.bigdata.{ApplicationConf, OutputTables}
-import org.apache.spark.sql.SparkSession
-import pureconfig.ConfigReader
 
 /**
   * Everything related to configuration files loading is handled here.
   */
 trait ConfigDefinition {
-
-  type SparkDependentConfig = SparkSession => Config
-
-  implicit def function1ToOutputTablesInfo(function1: _ => OutputTables): ResultTables = OutputTablesGenerator(function1)
-
-  implicit def function2ToOutputTablesInfo(function2: (_, _) => OutputTables): ResultTables = OutputTablesGenerator(function2)
-
-  implicit def toSparkDependentConfig(config: Config): SparkDependentConfig = _ => config
-
-  def loadConfig[T](configName: String, config: Config)(implicit reader: ConfigReader[T]): ApplicationConf[T] = {
-    Some(ConfigurationsLoader.loadConfig[T](configName, config))
-  }
 
   /**
     * The spark parameters that will be used on the remote cluster we submit our job on.
@@ -56,12 +40,12 @@ trait ConfigDefinition {
   /**
     * The configuration related to the different input sources we can use.
     */
-  val sourcesConf: SparkDependentConfig
+  val sourcesConf: Config
 
   /**
     * The configuration for the different jobs we have.
     */
-  val jobsConf: SparkDependentConfig
+  val jobsConf: Config
 
   /**
     * An optional configuration file related to our application.
@@ -69,17 +53,12 @@ trait ConfigDefinition {
     * Note: On the Application side, you can fill this parameter using the
     * loadConfig function from pureconfig
     */
-  val applicationConf: ApplicationConf[_] = None
+  val applicationConf: Option[CustomConfig[_]] = None
 
   /**
     * The arguments parameters that will be parsed for every jobs launched
     */
   val applicationArguments: Option[ArgumentsConfiguration[_]] = None
-
-  /**
-    * The output tables and jobs to run
-    */
-  val outputTables: ResultTables
 
 
 }

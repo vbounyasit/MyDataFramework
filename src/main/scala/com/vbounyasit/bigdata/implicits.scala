@@ -21,6 +21,7 @@ package com.vbounyasit.bigdata
 
 import cats.kernel.Semigroup
 import com.vbounyasit.bigdata.ETL.{ExecutionConfig, ExecutionConfigs}
+import com.vbounyasit.bigdata.exceptions.ErrorHandler
 import com.vbounyasit.bigdata.exceptions.ErrorHandler.JobSourcesNotFoundError
 import com.vbounyasit.bigdata.transform.ExecutionPlan
 import com.vbounyasit.bigdata.transform.pipeline.SourcePipeline
@@ -48,5 +49,11 @@ object implicits {
   implicit def toOption[T](element: T): Option[T] = Some(element)
 
   implicit def toExecutionConfig(executionPlan: ExecutionPlan): ExecutionConfig = ExecutionConfigs(executionPlan)
+
+  implicit def toEitherOfOptional(value: Option[Either[ErrorHandler, _]]): Either[ErrorHandler, Option[_]] =
+    value match {
+      case Some(either) => either.right.map(Some.apply)
+      case None => Right(None)
+    }
 
 }

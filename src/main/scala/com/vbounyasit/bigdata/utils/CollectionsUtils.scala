@@ -19,9 +19,9 @@
 
 package com.vbounyasit.bigdata.utils
 
+import cats.implicits._
 import com.vbounyasit.bigdata.ExceptionWithMessage
 import com.vbounyasit.bigdata.exceptions.ErrorHandler.MergingMapKeyNotFound
-import cats.implicits._
 
 import scala.reflect.{ClassTag, classTag}
 
@@ -48,7 +48,7 @@ object CollectionsUtils {
     * @param errorOnKeyMatching A String => ErrorHandler variable that will be used as Exception in case of keys matching error
     * @return A merged map of String -> tuple
     */
-  def mergeByKeyStrict[U, V](toMerge: Map[String, U], mergeWith: Map[String, V], errorOnKeyMatching: ExceptionWithMessage[MergingMapKeyNotFound]): Either[MergingMapKeyNotFound, Map[String, (U, V)]] = {
+  def mergeMapsByKeyStrict[U, V](toMerge: Map[String, U], mergeWith: Map[String, V], errorOnKeyMatching: ExceptionWithMessage[MergingMapKeyNotFound]): Either[MergingMapKeyNotFound, Map[String, (U, V)]] = {
     toMerge
       .map {
         case (key1, value1) => mergeWith.get(key1) match {

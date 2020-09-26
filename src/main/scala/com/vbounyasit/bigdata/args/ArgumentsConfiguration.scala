@@ -21,6 +21,7 @@ package com.vbounyasit.bigdata.args
 
 /**
   * A trait that contains all the defined configurations for command line argument parsing
+ *
   * @tparam T The type of the Arguments object we will use in our processing plan
   */
 trait ArgumentsConfiguration[T] {

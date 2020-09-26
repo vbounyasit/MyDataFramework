@@ -12,4 +12,5 @@ example/
 jobs_params.conf
 sources.conf
 application.conf
+my_job.conf
 jobs/
