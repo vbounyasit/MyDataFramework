@@ -24,11 +24,20 @@ The main objective of this Framework is to make the engineer mainly focus on wri
 by providing only the necessary information for input data sources extraction, output data persistence, and writing 
 the data transformation logic.
 
+## About me
+I am a Data Engineer who have been working with [Apache Spark](https://spark.apache.org/) for almost 4 years and have found a particular interest in this field.
 
+The reason I have decided to write this project was primarily for learning purposes, but more importantly, because through
+my experience at companies with some large scale data processing projects, I have realized that some parts of my projects were
+almost or exactly the same from one project to another (such as data extraction, result data persistence or Unit/Integration tests).
+
+I felt that something could be done about this, and that the data engineer community could have a use for something like that. Moreover,
+in order to deepen my understanding of Spark and the Scala language, what better way to practice than by building my own
+project from scratch?
 
 ## Context & Requirements
 _This section will cover the requirements as well as the main use case for this project to help you determine
-whether or not this Framework is for you._
+whether this Framework is for you._
 
 As a Data engineer, you are expected to oversee or take part in the data processing ecosystem at your company. 
 More specifically, you are expected to write data processing applications following certain rules provided by the business 
@@ -83,7 +92,7 @@ _Note : The requirements above might change, depending on people feedback and su
 ## Getting Started & Documentation
 The DataFlow Framework maintains reference documentation on
 Github [wiki pages](https://github.com/vbounyasit/DataFlow/wiki), and will have a 
-better support later on as the website construction progresses.
+better support later on as the wiki construction progresses.
 
 If you think this Framework is the solution you have been looking for, you can head over to
 the [wiki](https://github.com/vbounyasit/DataFlow/wiki) and start making your own DataFlow project !
@@ -94,18 +103,6 @@ the [wiki](https://github.com/vbounyasit/DataFlow/wiki) and start making your ow
 - [PureConfig](https://github.com/pureconfig/pureconfig)
 - [Scopt](https://github.com/scopt/scopt)
 - [Slf4j](https://www.slf4j.org/)
-
-## About me
-I am a data engineer who have been working with [Apache Spark](https://spark.apache.org/) for almost two years and have found a particular interest for this field. 
-I am passionate about tackling innovative and complex challenges.
-
-The reason I have decided to write this project was primarily for learning purposes, but more importantly, because through 
-my experience at a company with some large scale data processing projects, I have realized that some parts of my projects were 
-almost or exactly the same from one project to another (such as data extraction, result data persistence or Unit/Integration tests). 
-
-I felt that something could be done about this, and that the data engineer community could have a use for something like that. Moreover,
-in order to deepen my understanding of Spark and the Scala language, what better way to practice than by building my own 
-project from scratch?
 
 ## License
 The DataFlow Framework is released under version 2.0 of the [Apache License](http://www.apache.org/licenses/LICENSE-2.0).
