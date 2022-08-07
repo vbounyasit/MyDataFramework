@@ -105,4 +105,4 @@ the [wiki](https://github.com/vbounyasit/MyDataFramework/wiki) and start making 
 - [Slf4j](https://www.slf4j.org/)
 
 ## License
-The DataFlow Framework is released under version 2.0 of the [Apache License](http://www.apache.org/licenses/LICENSE-2.0).
+The MyDataFramework Framework is released under version 2.0 of the [Apache License](http://www.apache.org/licenses/LICENSE-2.0).
