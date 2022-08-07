@@ -1,4 +1,4 @@
-name := "DataFlow"
+name := "MyDataFramework"
 
 version := "1.0.7"
 
@@ -37,8 +37,8 @@ ThisBuild / organizationName := "data-projects"
 
 ThisBuild / scmInfo := Some(
   ScmInfo(
-    url("http://github.com/vbounyasit/DataFlow/tree/master"),
-    "scm:git:git://github.com/vbounyasit/DataFlow.git"
+    url("http://github.com/vbounyasit/MyDataFramework/tree/master"),
+    "scm:git:git://github.com/vbounyasit/MyDataFramework.git"
   )
 )
 ThisBuild / developers := List(
@@ -52,7 +52,7 @@ ThisBuild / developers := List(
 
 ThisBuild / description := "A Scala ETL Framework based on Apache Spark for Data engineers."
 ThisBuild / licenses := List("The Apache Software License, Version 2.0" -> new URL("http://www.apache.org/licenses/LICENSE-2.0.txt"))
-ThisBuild / homepage := Some(url("https://github.com/vbounyasit/DataFlow"))
+ThisBuild / homepage := Some(url("https://github.com/vbounyasit/MyDataFramework"))
 
 // Remove all additional repository other than Maven Central from POM
 ThisBuild / pomIncludeRepository := { _ => false }
