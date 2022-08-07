@@ -90,12 +90,12 @@ _Note : The requirements above might change, depending on people feedback and su
 &nbsp;
 
 ## Getting Started & Documentation
-The MyDataFramework Framework maintains reference documentation on
+The Framework maintains reference documentation on
 Github [wiki pages](https://github.com/vbounyasit/MyDataFramework/wiki), and will have a 
 better support later on as the wiki construction progresses.
 
 If you think this Framework is the solution you have been looking for, you can head over to
-the [wiki](https://github.com/vbounyasit/MyDataFramework/wiki) and start making your own DataFlow project !
+the [wiki](https://github.com/vbounyasit/MyDataFramework/wiki) and start making your own project !
 
 ## Libraries used
 - [Apache Spark](https://spark.apache.org/)
@@ -105,4 +105,4 @@ the [wiki](https://github.com/vbounyasit/MyDataFramework/wiki) and start making 
 - [Slf4j](https://www.slf4j.org/)
 
 ## License
-The MyDataFramework Framework is released under version 2.0 of the [Apache License](http://www.apache.org/licenses/LICENSE-2.0).
+The Framework is released under version 2.0 of the [Apache License](http://www.apache.org/licenses/LICENSE-2.0).
