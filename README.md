@@ -1,4 +1,4 @@
-# DataFlow Framework
+# DataEng Framework
 _A Scala ETL Framework based on [Apache Spark](https://spark.apache.org/) for Data engineers._
 
 The project has been released on Maven central ! See [Wiki pages](https://github.com/vbounyasit/DataFlow/wiki) to start right away.
